@@ -37,7 +37,7 @@ class FooterPutterAdmin {
     	$home_url = FOOTER_PUTTER_HOME_URL;
     	$version = FOOTER_PUTTER_VERSION;
     	$plugin = FOOTER_PUTTER_FRIENDLY_NAME;
-		$screenshot = plugins_url('screenshot1.jpg',__FILE__);    	
+		$screenshot = plugins_url('screenshot-1.jpg',__FILE__);    	
 		$logo = plugins_url('logo.png',__FILE__);    	
     	print <<< ADMIN_PANEL
 <div class="wrap">

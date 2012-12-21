@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, rel=nofollow
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,12 +37,13 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.1 = Fix link in admin.php from screenshot1.jpg to screenshot-1.jpg
 = 1.0 = Initial release
 
 == Upgrade Notice ==
 
-= 1.0 = 
-* Mandatory - initial version
+= 1.1 = 
+* Mandatory - fix link to screenshot-1.jpg
 
 == Links ==
 
