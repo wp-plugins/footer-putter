@@ -1,0 +1,19 @@
+#footer .footer-center, #footer .return-center, .footer-center, .return-center { text-align: center; margin: 10px 0px; }
+#footer .return-left, .return-left { float: left; width : 20%; }
+#footer .footer-right, .footer-right { float: right; text-align: right; width: 70%; margin-bottom: 10px; }
+#footer #footer-credits ul, #footer #footer-credits ul li, #footer-credits ul, #footer-credits ul li  {
+        display : inline-block; list-style-type: none; background: none; border: 0; margin: 0px; padding: 0; vertical-align: middle;  }
+#footer #footer-credits ul li:before, #footer-credits ul li:before {
+        content : '\B7'; }
+#footer #footer-credits ul li:first-child:before, #footer-credits ul li:first-child:before {
+        content : ''; }
+#footer #footer-credits ul li a, #footer-credits ul li a {
+        text-decoration: none; color: inherit; font-weight: normal; letter-spacing : normal; text-transform: none; margin:0 10px; }                
+#footer #footer-credits ul li a:hover, #footer-credits ul li a:hover {
+        text-decoration: underline;  }
+#footer-credits span.copyright, #footer-credits span.telephone, #footer-credits span.address {
+        font-weight: normal; letter-spacing : normal; text-transform: none; margin: 0 10px; vertical-align: middle;
+        background: inherit; border : none; }
+.custom-footer .white a, #footer-credits.white { color : white; }
+.custom-footer, .widget_footer_trademarks { text-align: center; margin: 10px 0;}
+.custom-footer .widget_footer_trademarks a, .widget_footer_trademarks a { margin: 10px; }
