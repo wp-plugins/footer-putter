@@ -216,7 +216,7 @@ class FooterCredits {
 			$clear = '<div class="clear"></div>';
 		}	
 		$copyright = self::copyright_owner(self::get_terms());
-		$tel = self::get_term('telephone');			
+		$telephone = self::get_term('telephone');			
 		$address = self::get_term('address');
 		return (empty($params['show_return']) ? '' :
 			self::return_to_top($params['return_text'], $params['return_href'], $params['return_class'])) . 

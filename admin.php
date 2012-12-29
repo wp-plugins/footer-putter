@@ -68,7 +68,7 @@ The plugins define two widgets:
 <p>Your footer will look something like this:</p>
 <img src="{$screenshot}" alt="Screenshot of Footer Credits Widget Area" />
 
-<h2>Instructions For WPWhoosh Users</h2>
+<h2>Instructions For WP Whoosh Users</h2>
 <p>If you have <a href="http://www.wpwhoosh.com/">whooshed</a> this site then all you need to do is replace the sample trademarks with the real trademarks.
 
 <h2>Instructions For Other Users</h2>

@@ -64,10 +64,6 @@ class FooterCreditsAdmin {
  	public static function get_url($id='', $noheader = false) {
 		return admin_url('admin.php?page='.self::get_slug().(empty($id) ? '' : ('&amp;id='.$id)).(empty($noheader) ? '' : '&amp;noheader=true'));
 	}
-
- 	private static function get_nonce_url($action, $id='', $noheader = false) {
-		return WPWhooshUtils::admin_url(self::get_slug(), $action, $id, $noheader,true,'site'); 
-	}
 	
 	public static function enable_screen($show_screen,$screen) {
 		if ($screen->id == self::get_screen_id())

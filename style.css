@@ -13,7 +13,7 @@
         text-decoration: underline;  }
 #footer-credits span.copyright, #footer-credits span.telephone, #footer-credits span.address {
         font-weight: normal; letter-spacing : normal; text-transform: none; margin: 0 10px; vertical-align: middle;
-        background: inherit; border : none; }
+        background: inherit; border : none; float: none; display: inline; }
 .custom-footer .white a, #footer-credits.white { color : white; }
 .custom-footer, .widget_footer_trademarks { text-align: center; margin: 10px 0;}
 .custom-footer .widget_footer_trademarks a, .widget_footer_trademarks a { margin: 10px; }
