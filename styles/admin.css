@@ -1,9 +1,12 @@
-div.icon32 { background-image : url(icon-32.png); background-repeat: no-repeat;}
+div.icon32 { background-image : url(../images/icon-32.png); background-repeat: no-repeat;}
 #poststuff { margin-right: 20px; }
 #poststuff input.error, #poststuff select.error { border: 1px solid red; background-color : #FEE; } 
 #poststuff div#message { margin-left: 10px; display: inline; padding: 10px; }
 #poststuff div#message div.updated { margin-left: 30px; padding: 8px; display: inline; }
 #poststuff label { display: inline-block; min-width: 200px; margin-right: 10px;}
+
+.trademark { vertical-align: top; border: 1px dashed whitesmoke; }
+.trademark:hover { cursor: move; }
 
 /* tooltips */
 .tooltip {position: relative; cursor: help; display: inline-block; text-decoration: none;

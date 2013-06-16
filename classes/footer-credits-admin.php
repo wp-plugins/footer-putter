@@ -12,7 +12,7 @@ class FooterCreditsAdmin {
     private static $initialized = false;
     private static $keys = array('owner', 'site', 'address', 'country', 'telephone', 
 				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_href', 'return_class',
-				'footer_class','footer_hook');
+				'footer_class','footer_hook','footer_remove','footer_filter_hook');
 	private static $tips = array(
 			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'), 
 			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'), 
@@ -26,14 +26,16 @@ class FooterCreditsAdmin {
 			'return_href' => array('heading' => 'Link Anchor' , 'tip' => 'The destination of the Return To Top link. This depends on our theme and also whether you want to go to the top of the page or the top of the content section. Typical values are #content, #header, #top, #page, #wrap or #container.'),
 			'return_class' => array('heading' => 'Return To Top Class' , 'tip' => 'Add any custom class you want to apply to the Return To Top link.'),
 			'footer_class' => array('heading' => 'Footer Class' , 'tip' => 'Add any custom class you want to apply to the footer. The plugin comes with a class <i>white</i> that marks the text in the footer white. This is useful where the footer background is a dark color.'),
-			'footer_hook' => array('heading' => 'Footer Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.')
+			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
+			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
+			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.')
 	);
 	private static $tooltips;
 
-	public static function init($parent,$version) {
+	public static function init($parent) {
 	    if (self::$initialized) return true;
 		self::$initialized = true;
-		self::$version = $version;
+		self::$version = FooterCredits::VERSION;
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
 		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
@@ -85,20 +87,23 @@ class FooterCreditsAdmin {
 		self::$screen_id =  add_submenu_page(self::get_parenthook(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
 			self::get_slug(), array(self::CLASSNAME,'settings_panel'));
 		add_action('load-'.self::get_screen_id(), array(self::CLASSNAME, 'load_page'));
-		add_action('admin_print_styles-'.self::get_screen_id(), array(self::CLASSNAME, 'print_styles'));
-		add_action('admin_footer-'.self::get_screen_id(), array(self::CLASSNAME, 'toggle_postboxes'));
+		add_action('admin_print_styles-'.self::get_screen_id(), array(self::CLASSNAME, 'enqueue_styles'));
 	}
 
-	public static function print_styles() {
-		wp_enqueue_style(self::CODE, plugins_url('style.css', __FILE__), array(),self::get_version());
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('admin.css', __FILE__), array(),self::get_version());
+	public static function enqueue_styles() {
+		wp_enqueue_style(self::CODE, plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),self::get_version());
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),self::get_version());
  	}		
 
-	public static function load_page() {
- 		$message =  isset($_POST['options_update']) ? self::save() : '';	
+	public static function enqueue_scripts() {
 		wp_enqueue_script('common');
 		wp_enqueue_script('wp-lists');
 		wp_enqueue_script('postbox');	
+		add_action('admin_footer-'.self::get_screen_id(), array(self::CLASSNAME, 'toggle_postboxes'));
+	}
+
+	public static function load_page() {
+ 		$message =  isset($_POST['options_update']) ? self::save() : '';	
 		$options = call_user_func(array(self::FOOTER, 'get_options'));
 		$callback_params = array ('options' => $options, 'message' => $message);
 		add_meta_box(self::CODE.'-intro', __('Introduction',self::DOMAIN), array(self::CLASSNAME, 'intro_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
@@ -106,15 +111,9 @@ class FooterCreditsAdmin {
 		add_meta_box(self::CODE.'-contact', __('Contact Details',self::DOMAIN), array(self::CLASSNAME, 'contact_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-legal', __('Legal Details',self::DOMAIN), array(self::CLASSNAME, 'legal_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-return', __('Return To Top',self::DOMAIN), array(self::CLASSNAME, 'return_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-classes', __('Custom Classes (Optional)',self::DOMAIN), array(self::CLASSNAME, 'classes_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-example', __('Preview Footer',self::DOMAIN), array(self::CLASSNAME, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core');
-
-		$current_screen = get_current_screen();
-		if (method_exists($current_screen,'add_help_tab')) {
-			$current_screen->add_help_tab( 
-				array( 'id' => self::CODE.'-overview', 'title' => 'Overview', 'content' => self::help_panel()));	
-		}
+		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+ 		add_action ('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
 	}
 
 	public static function save() {
@@ -124,14 +123,17 @@ class FooterCreditsAdmin {
   			$options = call_user_func(array(self::FOOTER, 'get_options'));
     		foreach ($page_options as $option) {
        			$val = array_key_exists($option, $_POST) ? trim(stripslashes($_POST[$option])) : '';
-       			if (array_key_exists($option,$options['terms']))
-    				$options['terms'][$option] = $val;
+				if (call_user_func(array(self::FOOTER, 'is_terms_key'),$option))
+					$options['terms'][$option] = $val;
  				else switch($option) {
- 					case 'return_href': $val = '#'.preg_replace('/\W/','',$val);
-    				default: $options[$option] = $val; 				
+ 					case 'return_href': $options[$option] = '#'.preg_replace('/\W/','',$val); break;
+					case 'footer_remove' : $options[$option] = !empty($val); break;
+ 					case 'footer_hook': 
+ 					case 'footer_filter_hook': $options[$option] = preg_replace('/\W/','',$val); break;
+					default: $options[$option] = trim($val); 				
 					}
     		} //end for	
-  		    $class='updated fade';
+    		$class='updated fade';
    			$saved =  call_user_func(array(self::FOOTER, 'save'), $options) ;
    			if ($saved)  {
        			$message = 'Footer Settings saved.';
@@ -159,31 +161,11 @@ class FooterCreditsAdmin {
 	</script>
 SCRIPT;
     }
-    
-	public static function help_panel(){	
-		$result = <<< HELP_PANEL
-<p>This admin screen is used to set up the values that appear in the footer, and in the Terms and Conditions and Privacy pages.</p>			
-<p>This information supplied here is substituted automatically into the Privacy and Terms pages and footer in the appropriate places.</p>
-<h4>Copyright Footer</h4>
-<p>You can set up as many of the following items as you want to appear on a single line in a footer widget:</p>
-<ul>
-<li>- Link to About Us page</li>
-<li>- Link to Contact Us page</li>
-<li>- Link to Privacy page</li>
-<li>- Link to Terms page</li>
-<li>- Copyright sSatement</li>
-<li>- Business Owner</li>
-<li>- Telephone</li>
-<li>- Address</li>
-</ul>
-HELP_PANEL;
-		return $result;
-	}
  
 	public static function intro_panel($post,$metabox){	
 		$message = $metabox['args']['message'];	 	
 		print <<< INTRO_PANEL
-<p>The following information can be used in both the footer widget and on the Privacy and Terms pages. See the Help section above for more information.</p>
+<p>The following information is in the Footer Copyright Widget and if this is a <a target="_blank" href="http://www.wpwhoosh.com">whooshed site</a> on the Privacy Statement and Terms and Conditions pages.</p>
 {$message}
 INTRO_PANEL;
 	}
@@ -232,32 +214,29 @@ LEGAL_PANEL;
 RETURN_PANEL;
 	}
 
- 	public static function classes_panel(){		
-		$options = call_user_func(array(self::FOOTER, 'get_options'));	
-		$tip1 = self::$tooltips->tip('footer_class');
-		$tip2 = self::$tooltips->tip('return_class');
-		print <<< CLASSES_PANEL
-<label>{$tip1}</label><input type="text" name="footer_class" size="30" value="{$options['footer_class']}" /><br/>
-<label>{$tip2}</label><input type="text" name="return_class" size="30" value="{$options['return_class']}" /><br/>
-CLASSES_PANEL;
-	}
-
  	public static function preview_panel($post,$metabox){		
 		$options = $metabox['args']['options'];	 	
 		echo call_user_func(array(self::FOOTER, 'footer'),array('nav_menu' => 'Footer Menu'));
 	}
 
- 	public static function advanced_panel(){		
-		$options = call_user_func(array(self::FOOTER, 'get_options'));	
+ 	public static function advanced_panel($post,$metabox){		
+		$options = $metabox['args']['options'];	 	
 		$tip1 = self::$tooltips->tip('footer_hook');
+		$tip2 = self::$tooltips->tip('footer_remove');
+		$tip3 = self::$tooltips->tip('footer_filter_hook');
+		$url = 'http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks';
+		$footer_remove = $options['footer_remove'] ? 'checked="checked" ' : '';
 		print <<< ADVANCED_PANEL
-<p>You can place the Copyright and Trademark widgets in any existing Widget area.</p>
-<p>However, if your theme does not have a suitably located Widget Area in the footer then you can create one by specifying the hook
+<p>You can place the Copyright and Trademark widgets in any existing Widget area. However, if your theme does not have a suitably located Widget Area in the footer then you can create one by specifying the hook
 where the Widget Area will be located.</p>
 <p>You may use a standard WordPress hook like <i>get_footer</i> or <i>wp_footer</i> or choose a hook that is theme-specific such as <i>twentyten_credits</i>, 
-<i>twentyeleven_credits</i> or <i>pagelines_leaf</i>.</p> 
-<p>If you using a Genesis child theme and the theme does not have a suitable widget area then use the hook <i>genesis_footer</i>.</p> 
+<i>twentyeleven_credits</i> or <i>twentytwelve_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
+the hook <i>genesis_footer</i> or maybe <i>genesis_after</i>. See what looks best. Click for <a href="{$url}">suggestions of which hook to use for common WordPress themes</a>.</p> 
 <label>{$tip1}</label><input type="text" name="footer_hook" size="30" value="{$options['footer_hook']}" /><br/>
+<label>{$tip2}</label><input type="checkbox" name="footer_remove" {$footer_remove}value="1" /><br/>
+<p>If your WordPress theme supplies a filter hook rather than an action hook where it generates the footer, and you want to suppress the theme footer,
+then specify the hook below. For example, entering <i>genesis_footer_output</i> will suppress the standard Genesis child theme footer.</p>
+<label>{$tip3}</label><input type="text" name="footer_filter_hook" size="30" value="{$options['footer_filter_hook']}" /><br/>
 ADVANCED_PANEL;
 	}
 
