@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, rel=nofollow
 Requires at least: 3.0
 Tested up to: 3.5
-Stable tag: 1.2
+Stable tag: 1.3
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,14 +37,15 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.3 = Pre-configure according to the WordPress theme
 = 1.2 = Fix display of telephone number
 = 1.1 = Fix link in admin.php from screenshot1.jpg to screenshot-1.jpg
 = 1.0 = Initial release
 
 == Upgrade Notice ==
 
-= 1.2 = 
-* Mandatory - fix display of telephone number in footer
+= 1.3 = 
+* Optional - Pre-configure settings to make it work with more themes out of the box. 
 
 == Links ==
 

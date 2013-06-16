@@ -1,44 +1,67 @@
 <?php
 class FooterPutterAdmin {
-    const CREDITS = 'FooterCreditsAdmin';
-    private $pagehook;
+    const CLASSNAME = 'FooterPutterAdmin'; //this class
+    const CODE = 'footer-putter';
+    const DOMAIN = 'FooterPutter';
+    
+	private static $plugin = FOOTER_PUTTER_PLUGIN_NAME;
+	private static $path = FOOTER_PUTTER_PATH;
+    private static $slug = FOOTER_PUTTER_PLUGIN_NAME;
+    private static $screen_id;
+    private static $initialized = false;
 
-	function __construct() {
-		add_filter('screen_layout_columns', array(&$this, 'screen_layout_columns'), 10, 2);
-		add_filter('plugin_action_links',array(&$this, 'plugin_action_links'), 10, 2 );
-		add_action('admin_menu', array(&$this,'admin_menu'));
-		call_user_func (array(self::CREDITS,'init'),FOOTER_PUTTER_PLUGIN_NAME,FOOTER_PUTTER_VERSION);
+    private static function get_slug(){
+		return self::$slug;
+	}
+		
+    private static function get_screen_id(){
+		return self::$screen_id;
 	}
 
-	function screen_layout_columns($columns, $screen) {
+	static function init() {
+	    if (self::$initialized) return true;
+		self::$initialized = true;
+		add_filter('plugin_action_links',array(self::CLASSNAME, 'plugin_action_links'), 10, 2 );
+		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
+		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
+		add_filter('pre_option_link_manager_enabled', '__return_true' );
+	}
+
+	static function screen_layout_columns($columns, $screen) {
 		if (!defined( 'WP_NETWORK_ADMIN' ) && !defined( 'WP_USER_ADMIN' )) {
-			if ($screen == $this->pagehook) {
-				$columns[$this->pagehook] = 2;
+			if ($screen == self::get_screen_id()) {
+				$columns[self::get_screen_id()] = 2;
 			}
 		}
 		return $columns;
 	}
 
-	function plugin_action_links( $links, $file ) {
-		if ( is_array($links) && (FOOTER_PUTTER_PATH == $file )) {
+	static function plugin_action_links( $links, $file ) {
+		if ( is_array($links) && (self::$path == $file )) {
 			$settings_link = '<a href="' . admin_url( 'admin.php?page='.FOOTER_PUTTER_PLUGIN_NAME) . '">Settings</a>';
 			array_unshift( $links, $settings_link );
 		}
 		return $links;
 	}
 
-	function admin_menu() {
-		$this->pagehook = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
-			FOOTER_PUTTER_PLUGIN_NAME, array(&$this,'resources_panel'),plugins_url('/menu-icon.png',__FILE__) );
+	static function admin_menu() {
+		self::$screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
+			FOOTER_PUTTER_PLUGIN_NAME, array(self::CLASSNAME,'settings_panel'),plugins_url('images/icon-16.png',dirname(__FILE__)) );
+		add_submenu_page(FOOTER_PUTTER_PLUGIN_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'Intro', 'manage_options', FOOTER_PUTTER_PLUGIN_NAME,array(self::CLASSNAME,'settings_panel') );
+		add_action ('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_styles'));		
 	}
+
+	static function enqueue_styles() {
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
+ 	}	
 	
-	function resources_panel() {
-    	$footer_url = call_user_func(array(self::CREDITS, 'get_url')); 
+	static function settings_panel() {
+    	$footer_url = FooterCreditsAdmin::get_url(); 
     	$home_url = FOOTER_PUTTER_HOME_URL;
     	$version = FOOTER_PUTTER_VERSION;
     	$plugin = FOOTER_PUTTER_FRIENDLY_NAME;
-		$screenshot = plugins_url('screenshot-1.jpg',__FILE__);    	
-		$logo = plugins_url('logo.png',__FILE__);    	
+		$screenshot = plugins_url('screenshot-1.jpg',dirname(__FILE__));    	
+		$logo = plugins_url('images/logo.png', dirname(__FILE__));    	
     	print <<< ADMIN_PANEL
 <div class="wrap">
 <h2>{$plugin} {$version} Overview</h2>
@@ -95,5 +118,5 @@ or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_c
 ADMIN_PANEL;
 	}
 }
-$footer_putter_admin = new FooterPutterAdmin();
+FooterPutterAdmin::init();
 ?>
