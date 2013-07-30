@@ -12,7 +12,7 @@ class FooterCreditsAdmin {
     private static $initialized = false;
     private static $keys = array('owner', 'site', 'address', 'country', 'telephone', 
 				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_href', 'return_class',
-				'footer_class','footer_hook','footer_remove','footer_filter_hook');
+				'footer_class','footer_hook','footer_remove','footer_filter_hook','enable_html5');
 	private static $tips = array(
 			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'), 
 			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'), 
@@ -28,7 +28,8 @@ class FooterCreditsAdmin {
 			'footer_class' => array('heading' => 'Footer Class' , 'tip' => 'Add any custom class you want to apply to the footer. The plugin comes with a class <i>white</i> that marks the text in the footer white. This is useful where the footer background is a dark color.'),
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
 			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
-			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.')
+			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.'),
+			'enable_html5' => array('heading' => 'Enable HTML5' , 'tip' => 'Use the HTML5 &lt;footer&gt; element for the custom footer widget area.')
 	);
 	private static $tooltips;
 
@@ -40,7 +41,7 @@ class FooterCreditsAdmin {
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
 		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
 		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
-		self::$tooltips = new FooterTooltip(self::$tips);
+		self::$tooltips = new DIYTooltip(self::$tips);
 	}
 	
     private static function get_parenthook(){
@@ -51,7 +52,7 @@ class FooterCreditsAdmin {
 		return self::$version;
 	}
 
-    private static function get_slug(){
+    public static function get_slug(){
 		return self::$slug;
 	}
 		
@@ -87,20 +88,8 @@ class FooterCreditsAdmin {
 		self::$screen_id =  add_submenu_page(self::get_parenthook(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
 			self::get_slug(), array(self::CLASSNAME,'settings_panel'));
 		add_action('load-'.self::get_screen_id(), array(self::CLASSNAME, 'load_page'));
-		add_action('admin_print_styles-'.self::get_screen_id(), array(self::CLASSNAME, 'enqueue_styles'));
 	}
 
-	public static function enqueue_styles() {
-		wp_enqueue_style(self::CODE, plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),self::get_version());
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),self::get_version());
- 	}		
-
-	public static function enqueue_scripts() {
-		wp_enqueue_script('common');
-		wp_enqueue_script('wp-lists');
-		wp_enqueue_script('postbox');	
-		add_action('admin_footer-'.self::get_screen_id(), array(self::CLASSNAME, 'toggle_postboxes'));
-	}
 
 	public static function load_page() {
  		$message =  isset($_POST['options_update']) ? self::save() : '';	
@@ -113,7 +102,21 @@ class FooterCreditsAdmin {
 		add_meta_box(self::CODE.'-return', __('Return To Top',self::DOMAIN), array(self::CLASSNAME, 'return_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-example', __('Preview Footer',self::DOMAIN), array(self::CLASSNAME, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
- 		add_action ('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
+		add_action('admin_enqueue_scripts', array(self::CLASSNAME, 'enqueue_styles'));
+ 		add_action('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
+	}
+
+	public static function enqueue_styles() {
+		wp_enqueue_style(self::CODE, plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),self::get_version());
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css',dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
+		wp_enqueue_style(self::CODE.'-tooltip', plugins_url('styles/tooltip.css',dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
+ 	}		
+
+	public static function enqueue_scripts() {
+		wp_enqueue_script('common');
+		wp_enqueue_script('wp-lists');
+		wp_enqueue_script('postbox');	
+		add_action('admin_footer-'.self::get_screen_id(), array(self::CLASSNAME, 'toggle_postboxes'));
 	}
 
 	public static function save() {
@@ -224,10 +227,12 @@ RETURN_PANEL;
 		$tip1 = self::$tooltips->tip('footer_hook');
 		$tip2 = self::$tooltips->tip('footer_remove');
 		$tip3 = self::$tooltips->tip('footer_filter_hook');
+		$tip4 = self::$tooltips->tip('enable_html5');
 		$url = 'http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks';
 		$footer_remove = $options['footer_remove'] ? 'checked="checked" ' : '';
+		$enable_html5 = $options['enable_html5'] ? 'checked="checked" ' : '';
 		print <<< ADVANCED_PANEL
-<p>You can place the Copyright and Trademark widgets in any existing Widget area. However, if your theme does not have a suitably located Widget Area in the footer then you can create one by specifying the hook
+<p>You can place the Copyright and Trademark widgets in any existing widget area. However, if your theme does not have a suitably located widget area in the footer then you can create one by specifying the hook
 where the Widget Area will be located.</p>
 <p>You may use a standard WordPress hook like <i>get_footer</i> or <i>wp_footer</i> or choose a hook that is theme-specific such as <i>twentyten_credits</i>, 
 <i>twentyeleven_credits</i> or <i>twentytwelve_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
@@ -237,6 +242,7 @@ the hook <i>genesis_footer</i> or maybe <i>genesis_after</i>. See what looks bes
 <p>If your WordPress theme supplies a filter hook rather than an action hook where it generates the footer, and you want to suppress the theme footer,
 then specify the hook below. For example, entering <i>genesis_footer_output</i> will suppress the standard Genesis child theme footer.</p>
 <label>{$tip3}</label><input type="text" name="footer_filter_hook" size="30" value="{$options['footer_filter_hook']}" /><br/>
+<label>{$tip4}</label><input type="checkbox" name="enable_html5" {$enable_html5}value="1" /><br/>
 ADVANCED_PANEL;
 	}
 
@@ -268,18 +274,5 @@ ADVANCED_PANEL;
 </div>
 <?php
 	}    
-}
-
-class FooterTooltip {
-    const DOMAIN = "FooterCredits";
-	private $labels = array();
-	function __construct($labels) {
-		$this->labels = $labels;
-	}
-	function tip($label) {
-		$heading = array_key_exists($label,$this->labels) ? __($this->labels[$label]['heading'],self::DOMAIN) : ''; 
-		$tip = array_key_exists($label,$this->labels) ? __($this->labels[$label]['tip'],self::DOMAIN) : ''; 
-		return sprintf('<a href="#" class="tooltip">%1$s<span>%2$s</span></a>',$heading, $tip);
-	}
 }
 ?>

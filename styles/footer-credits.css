@@ -17,8 +17,6 @@
 #footer-credits.dark, #footer-credits.dark a, .dark a , .dark a:visited { color : #222222; }
 #footer-credits.light, #footer-credits.light a, .light a, .light a:visited { color : #DDDDDD; }
 #footer-credits.white, #footer-credits.white a, .white a, .white a:visited { color : white; }
-
 .widget_footer_trademarks { text-align: center; margin: 10px 0;}
 .widget_footer_trademarks a { margin: 10px; }
 .widget_footer_trademarks img { border: 0 !important; }
-

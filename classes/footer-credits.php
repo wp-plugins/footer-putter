@@ -2,10 +2,10 @@
 class FooterCredits {
     const CLASSNAME = 'FooterCredits'; //name of class - must be same as line above - hard code for performance
     const DOMAIN = 'FooterCredits'; //text domain for translation
-    const CODE = 'footer-credits'; //shortcode
+    const CODE = 'footer-credits'; //element prefix
 	const OPTIONS_NAME = 'footer_credits_options'; 
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.3';
+	const VERSION = '1.4';
     private static $version;
 	protected static $options  = array();
 	protected static $defaults  = array(
@@ -34,7 +34,8 @@ class FooterCredits {
 		'footer_class' => '',			
 		'footer_hook' => '',
 		'footer_remove' => true,
- 		'footer_filter_hook' => ''
+ 		'footer_filter_hook' => '',
+ 		'enable_html5' => false
 	);
 
     private static function get_version(){
@@ -80,14 +81,16 @@ class FooterCredits {
 	}
 
     static function register_sidebars() {
-    	if (self::get_option('footer_hook'))
+    	if (self::get_option('footer_hook')) {
+			$tag = self::get_option('enable_html5') ? 'section' : 'div';
 			register_sidebar( array(
 				'id' => self::SIDEBAR_ID,
-				'name'	=> __( 'Custom Footer Widget Area', self::CLASSNAME ),
+				'name'	=> __( 'Credibility Footer', self::CLASSNAME ),
 				'description' => __( 'Custom footer section for copyright, trademarks, etc', self::CLASSNAME),
-				'before_widget' => '<div id="%1$s" class="widget %2$s"><div class="widget-wrap">',
-				'after_widget'  => '</div></div>'	
+				'before_widget' => '<'.$tag.' id="%1$s" class="widget %2$s"><div class="widget-wrap">',
+				'after_widget'  => '</div></'.$tag.'>'				
 			) );
+		}
     }
 	
 	static function register_widgets() {
@@ -264,9 +267,15 @@ class FooterCredits {
 
 	static function custom_footer() {
 		if ( is_active_sidebar( self::SIDEBAR_ID) ) {
-			echo '<div class="custom-footer">';
-			dynamic_sidebar( self::SIDEBAR_ID );
-			echo '</div><!-- end .custom-footer -->';
+			if (self::get_option('enable_html5')) {
+				echo '<footer class="custom-footer" role="contentinfo" itemscope="" itemtype="http://schema.org/WPFooter">';
+				dynamic_sidebar( self::SIDEBAR_ID );
+				echo '</footer><!-- end .custom-footer -->';
+			} else {
+				echo '<div class="custom-footer">';
+				dynamic_sidebar( self::SIDEBAR_ID );
+				echo '</div><!-- end .custom-footer -->';
+			}
 		}
 	}
 
@@ -306,6 +315,7 @@ class FooterCredits {
 			case 'genesis': 
 				self::$defaults['footer_hook'] = 'genesis_footer';
 				self::$defaults['footer_filter_hook'] = 'genesis_footer_output';
+				self::$defaults['enable_html5'] = function_exists('genesis_html5') && genesis_html5();
 				break;
 			case 'graphene': 
 				self::$defaults['footer_hook'] = 'graphene_footer'; break;
@@ -404,4 +414,3 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 <?php
 	}
 }
-FooterCredits::init();
