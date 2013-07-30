@@ -4,9 +4,8 @@ class FooterPutterAdmin {
     const CODE = 'footer-putter';
     const DOMAIN = 'FooterPutter';
     
-	private static $plugin = FOOTER_PUTTER_PLUGIN_NAME;
 	private static $path = FOOTER_PUTTER_PATH;
-    private static $slug = FOOTER_PUTTER_PLUGIN_NAME;
+    private static $slug;
     private static $screen_id;
     private static $initialized = false;
 
@@ -18,8 +17,9 @@ class FooterPutterAdmin {
 		return self::$screen_id;
 	}
 
-	static function init() {
+	static function init($root) {
 	    if (self::$initialized) return true;
+	    self::$slug = $root;
 		self::$initialized = true;
 		add_filter('plugin_action_links',array(self::CLASSNAME, 'plugin_action_links'), 10, 2 );
 		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
@@ -46,14 +46,9 @@ class FooterPutterAdmin {
 
 	static function admin_menu() {
 		self::$screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
-			FOOTER_PUTTER_PLUGIN_NAME, array(self::CLASSNAME,'settings_panel'),plugins_url('images/icon-16.png',dirname(__FILE__)) );
+			self::get_slug(), array(self::CLASSNAME,'settings_panel'),plugins_url('images/icon-16.png',dirname(__FILE__)) );
 		add_submenu_page(FOOTER_PUTTER_PLUGIN_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'Intro', 'manage_options', FOOTER_PUTTER_PLUGIN_NAME,array(self::CLASSNAME,'settings_panel') );
-		add_action ('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_styles'));		
 	}
-
-	static function enqueue_styles() {
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
- 	}	
 	
 	static function settings_panel() {
     	$footer_url = FooterCreditsAdmin::get_url(); 
@@ -98,7 +93,7 @@ The plugins define two widgets:
 <ol>
 <li>Create a <i>Privacy Policy</i> page with no sidebar and set robots meta as noindex, noarchive.</li>
 <li>Create a <i>Terms of Use</i> page with no sidebar and set robots meta as noindex, noarchive.</li>
-<li>Create a page with a contact form.</li>
+<li>Create a <i>Contact</i> page with a contact form.</li>
 <li>Create a WordPress menu <i>Footer Menu</i> with the above 3 pages.</li>
 <li>Go to <a href="{$footer_url}">Footer Credits</a> and update the Site Owner details and set the Footer Hook according to your choice of WordPress theme.</li>
 <li>Drag a <i>Footer Copyright Widget</i> into the <i>Custom Footer Widget Area</i> and select the <i>Footer Menu</i> and optional text if you want to have a "Return To Top" link</li>
@@ -111,12 +106,11 @@ The plugins define two widgets:
 <p>The footer hook is only required if your theme does not already have a footer widget area into which you can drag the two widgets.</p>
 
 <p>For some themes, the footer hook is left blank, for others use a WordPress hook such as <i>get_footer</i> or <i>wp_footer</i>, 
-or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
+or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
 
 <h3>Getting Help</h3>
 <p>Check out the <a href="{$home_url}">Footer Putter Plugin page</a> for more information about the plugin.</p> 
 ADMIN_PANEL;
 	}
 }
-FooterPutterAdmin::init();
 ?>

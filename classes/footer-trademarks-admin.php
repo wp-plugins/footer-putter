@@ -7,6 +7,7 @@ class FooterTrademarksAdmin {
     const FIELDNAME = 'not_on_404';
 
     private static $initialized = false;
+    private static $version;
     private static $parenthook;
     private static $slug;
     private static $screen_id;
@@ -14,11 +15,16 @@ class FooterTrademarksAdmin {
 	public static function init($parent) {		
 	    if (self::$initialized) return true;
 		self::$initialized = true;
+		self::$version = FooterCredits::VERSION;		
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
 	    self::$screen_id = self::$parenthook.'_page_' . self::$slug;
 		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
 		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
+	}
+
+    private static function get_version(){
+		return self::$version;
 	}
 
     private static function get_parenthook(){
@@ -60,7 +66,7 @@ class FooterTrademarksAdmin {
 	}
 
 	public static function enqueue_styles() {
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),GENESIS_CLUB_VERSION);
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),self::get_version());
  	}		
 
 	public static function settings_panel() {
@@ -69,7 +75,7 @@ class FooterTrademarksAdmin {
 		$screenshot2 = plugins_url('images/add-link-category.jpg',dirname(__FILE__));		
 		$screenshot3 = plugins_url('images/add-link.jpg',dirname(__FILE__));
 		$linkcat = admin_url('edit-tags.php?taxonomy=link_category');
-		$linkcat = admin_url('link-add.php');
+		$addlink = admin_url('link-add.php');
 		$widgets = admin_url('widgets.php');
 ?>
 <div class="wrap">

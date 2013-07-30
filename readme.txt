@@ -3,8 +3,8 @@ Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, rel=nofollow
 Requires at least: 3.0
-Tested up to: 3.5
-Stable tag: 1.3
+Tested up to: 3.5.2
+Stable tag: 1.4
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 * Supports both a single line centred footer and a multi-line right aligned footer
 * The Footer hook setting allows you to add the footer in just the right place on themes that do not have suitable widget areas 
 * Ensures all links in the footer widgets are rel=nofollow in line with best SEO recommendations
+* HTML5 support
 
 == Installation ==
 
@@ -37,6 +38,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.4 = Added support for HTML5 themes
 = 1.3 = Pre-configure according to the WordPress theme
 = 1.2 = Fix display of telephone number
 = 1.1 = Fix link in admin.php from screenshot1.jpg to screenshot-1.jpg
@@ -44,8 +46,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.3 = 
-* Optional - Pre-configure settings to make it work with more themes out of the box. 
+= 1.4 = 
+* Optional - Add HTML5 support. 
 
 == Links ==
 
