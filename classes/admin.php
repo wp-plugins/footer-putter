@@ -7,7 +7,6 @@ class FooterPutterAdmin {
 	private static $path = FOOTER_PUTTER_PATH;
     private static $slug;
     private static $screen_id;
-    private static $initialized = false;
 
     private static function get_slug(){
 		return self::$slug;
@@ -18,22 +17,10 @@ class FooterPutterAdmin {
 	}
 
 	static function init($root) {
-	    if (self::$initialized) return true;
 	    self::$slug = $root;
-		self::$initialized = true;
-		add_filter('plugin_action_links',array(self::CLASSNAME, 'plugin_action_links'), 10, 2 );
-		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
-		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
 		add_filter('pre_option_link_manager_enabled', '__return_true' );
-	}
-
-	static function screen_layout_columns($columns, $screen) {
-		if (!defined( 'WP_NETWORK_ADMIN' ) && !defined( 'WP_USER_ADMIN' )) {
-			if ($screen == self::get_screen_id()) {
-				$columns[self::get_screen_id()] = 2;
-			}
-		}
-		return $columns;
+		add_filter('plugin_action_links',array(self::CLASSNAME, 'plugin_action_links'), 10, 2 );
+		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
 	}
 
 	static function plugin_action_links( $links, $file ) {

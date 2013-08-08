@@ -6,23 +6,19 @@ class FooterTrademarksAdmin {
 	const SLUG = 'trademarks';
     const FIELDNAME = 'not_on_404';
 
-    private static $initialized = false;
     private static $version;
     private static $parenthook;
     private static $slug;
     private static $screen_id;
 
 	public static function init($parent) {		
-	    if (self::$initialized) return true;
-		self::$initialized = true;
 		self::$version = FooterCredits::VERSION;		
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
 	    self::$screen_id = self::$parenthook.'_page_' . self::$slug;
-		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
 		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
 	}
-
+	
     private static function get_version(){
 		return self::$version;
 	}
@@ -45,15 +41,6 @@ class FooterTrademarksAdmin {
 		else
 			return $show_screen;
 	}	
-	
-	public static function screen_layout_columns($columns, $screen) {
-		if (!defined( 'WP_NETWORK_ADMIN' ) && !defined( 'WP_USER_ADMIN' )) {
-			if ($screen == self::get_screen_id()) {
-				$columns[self::get_screen_id()] = 2;
-			}
-		}
-		return $columns;
-	}
 
 	public static function admin_menu() {
 		add_submenu_page(self::get_parenthook(), __('Trademarks'), __('Trademarks'), 'manage_options', 
@@ -66,7 +53,7 @@ class FooterTrademarksAdmin {
 	}
 
 	public static function enqueue_styles() {
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(),self::get_version());
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(), self::get_version());
  	}		
 
 	public static function settings_panel() {
