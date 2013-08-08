@@ -9,7 +9,6 @@ class FooterCreditsAdmin {
     private static $parenthook;
     private static $slug;
     private static $screen_id;
-    private static $initialized = false;
     private static $keys = array('owner', 'site', 'address', 'country', 'telephone', 
 				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_href', 'return_class',
 				'footer_class','footer_hook','footer_remove','footer_filter_hook','enable_html5');
@@ -34,14 +33,10 @@ class FooterCreditsAdmin {
 	private static $tooltips;
 
 	public static function init($parent) {
-	    if (self::$initialized) return true;
-		self::$initialized = true;
 		self::$version = FooterCredits::VERSION;
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
-		add_filter('screen_layout_columns', array(self::CLASSNAME, 'screen_layout_columns'), 10, 2);
 		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
-		self::$tooltips = new DIYTooltip(self::$tips);
 	}
 	
     private static function get_parenthook(){
@@ -74,15 +69,6 @@ class FooterCreditsAdmin {
 		else
 			return $show_screen;
 	}	
-	
-	public static function screen_layout_columns($columns, $screen) {
-		if (!defined( 'WP_NETWORK_ADMIN' ) && !defined( 'WP_USER_ADMIN' )) {
-			if ($screen == self::get_screen_id()) {
-				$columns[self::get_screen_id()] = 2;
-			}
-		}
-		return $columns;
-	}
 
 	public static function admin_menu() {
 		self::$screen_id =  add_submenu_page(self::get_parenthook(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
@@ -104,6 +90,7 @@ class FooterCreditsAdmin {
 		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_action('admin_enqueue_scripts', array(self::CLASSNAME, 'enqueue_styles'));
  		add_action('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
+		self::$tooltips = new DIYTooltip(self::$tips);
 	}
 
 	public static function enqueue_styles() {

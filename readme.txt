@@ -3,8 +3,8 @@ Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, rel=nofollow
 Requires at least: 3.0
-Tested up to: 3.5.2
-Stable tag: 1.4
+Tested up to: 3.6
+Stable tag: 1.4.1
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,6 +38,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.4.1 = Reinstate support for PHP 5.2
 = 1.4 = Added support for HTML5 themes
 = 1.3 = Pre-configure according to the WordPress theme
 = 1.2 = Fix display of telephone number
@@ -46,8 +47,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.4 = 
-* Optional - Add HTML5 support. 
+= 1.4.1 = 
+* Optional - Reinstate support for PHP 5.2 
 
 == Links ==
 
