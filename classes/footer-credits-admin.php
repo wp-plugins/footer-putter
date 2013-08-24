@@ -10,7 +10,7 @@ class FooterCreditsAdmin {
     private static $slug;
     private static $screen_id;
     private static $keys = array('owner', 'site', 'address', 'country', 'telephone', 
-				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_href', 'return_class',
+				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_class',
 				'footer_class','footer_hook','footer_remove','footer_filter_hook','enable_html5');
 	private static $tips = array(
 			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'), 
@@ -22,7 +22,6 @@ class FooterCreditsAdmin {
 			'updated' => array('heading' => 'Last Updated' , 'tip' => 'This will be defaulted as today. For example, Oct 23rd, 2012'),
 			'copyright_start_year' => array('heading' => 'Copyright Start' , 'tip' => 'The start year of the business appears in the copyright statement in the footer and an on the Terms and Conditions page.'),
 			'return_text' => array('heading' => 'Link Text' , 'tip' => 'The text of the Return To Top link. For example, <i>Return To Top</i> or <i>Back To Top</i>.'),
-			'return_href' => array('heading' => 'Link Anchor' , 'tip' => 'The destination of the Return To Top link. This depends on our theme and also whether you want to go to the top of the page or the top of the content section. Typical values are #content, #header, #top, #page, #wrap or #container.'),
 			'return_class' => array('heading' => 'Return To Top Class' , 'tip' => 'Add any custom class you want to apply to the Return To Top link.'),
 			'footer_class' => array('heading' => 'Footer Class' , 'tip' => 'Add any custom class you want to apply to the footer. The plugin comes with a class <i>white</i> that marks the text in the footer white. This is useful where the footer background is a dark color.'),
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
@@ -116,7 +115,6 @@ class FooterCreditsAdmin {
 				if (call_user_func(array(self::FOOTER, 'is_terms_key'),$option))
 					$options['terms'][$option] = $val;
  				else switch($option) {
- 					case 'return_href': $options[$option] = '#'.preg_replace('/\W/','',$val); break;
 					case 'footer_remove' : $options[$option] = !empty($val); break;
  					case 'footer_hook': 
  					case 'footer_filter_hook': $options[$option] = preg_replace('/\W/','',$val); break;
@@ -197,10 +195,8 @@ LEGAL_PANEL;
  	public static function return_panel($post,$metabox){		
 		$options = $metabox['args']['options'];	 	
 		$tip1 = self::$tooltips->tip('return_text');
-		$tip2 = self::$tooltips->tip('return_href');
 		print <<< RETURN_PANEL
 <label>{$tip1}</label><input type="text" name="return_text" size="20" value="{$options['return_text']}" /><br/>
-<label>{$tip2}</label><input type="text" name="return_href" size="20" value="{$options['return_href']}" /><br/>
 RETURN_PANEL;
 	}
 
