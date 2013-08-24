@@ -5,7 +5,7 @@ class FooterCredits {
     const CODE = 'footer-credits'; //element prefix
 	const OPTIONS_NAME = 'footer_credits_options'; 
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.4';
+	const VERSION = '1.5';
     private static $version;
 	protected static $options  = array();
 	protected static $defaults  = array(
@@ -29,7 +29,6 @@ class FooterCredits {
 		'show_address' => true,
 		'show_return' => true,
 		'return_text' => 'Return To Top',
-		'return_href' => '#header',
 		'return_class' => '',
 		'footer_class' => '',			
 		'footer_hook' => '',
@@ -215,9 +214,8 @@ class FooterCredits {
         return self::filter_links(wp_nav_menu(array('menu' => $menu, 'echo' => false, 'container' => false)));
 	}
 
-	static function return_to_top( $text, $href, $class) {
-		if ('#'==$href) $href = self::$defaults['return_href'];
-		return sprintf( '<div class="%1$s"><a href="%2$s" rel="nofollow">%3$s</a></div>', trim($class), esc_url( $href), $text);
+	static function return_to_top( $text, $class) {
+		return sprintf( '<div class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
 	}
 
 
@@ -240,7 +238,7 @@ class FooterCredits {
 		$telephone = self::get_term('telephone');			
 		$address = self::get_term('address');
 		return (empty($params['show_return']) ? '' :
-			self::return_to_top($params['return_text'], $params['return_href'], $params['return_class'])) . 
+			self::return_to_top($params['return_text'], $params['return_class'])) . 
 			sprintf('<div id="%1$s" class="%2$s">%3$s%4$s%5$s%6$s</div>%7$s<!-- end #%1$s -->', 
 				self::CODE,
 				$params['footer_class'], 	

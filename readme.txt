@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, rel=nofollow
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 1.4.1
+Stable tag: 1.5
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,9 +35,16 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Screenshots ==
 1. Example of a footer with both a copyright widget and a trademark widget 
+1. Setting up Footer Credits copyright and address details 
+1. Creating a typical footer menu 
+1. Adding a trademark link 
+1. Adding widgets into the Credibility Footer widget area 
+1. Configuring the Footer Copyright Widget 
+1. Configuring the Footer Trademarks Widget 
 
 == Changelog ==
 
+= 1.5 = Use Javascript for Return To Top link to make it work on HTML5 sites, and strengthen CSS to ensure footer copyright and trademark widgets are full width
 = 1.4.1 = Reinstate support for PHP 5.2
 = 1.4 = Added support for HTML5 themes
 = 1.3 = Pre-configure according to the WordPress theme
@@ -47,8 +54,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.4.1 = 
-* Optional - Reinstate support for PHP 5.2 
+= 1.5 = 
+* Optional - Changes to Return To Top Link and Footer CSS to improve support for HTML5 sites.  
 
 == Links ==
 
