@@ -5,7 +5,7 @@ class FooterCredits {
     const CODE = 'footer-credits'; //element prefix
 	const OPTIONS_NAME = 'footer_credits_options'; 
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.4';
+	const VERSION = '1.5';
     private static $version;
 	protected static $options  = array();
 	protected static $defaults  = array(
@@ -19,17 +19,19 @@ class FooterCredits {
 			'email' => '',
 			'telephone' => '',
 			'address' => '',
-			'updated' => ''),
+			'updated' => '',
+			'privacy_contact' => '',
+			'terms_contact' => ''),
 		'nav_menu' => 0,
 		'separator' => '&nbsp;&middot;&nbsp;',
 		'center' => true,
 		'two_lines' => true,
 		'show_copyright' => true,
 		'show_telephone' => true,
+		'show_email' => false,
 		'show_address' => true,
 		'show_return' => true,
 		'return_text' => 'Return To Top',
-		'return_href' => '#header',
 		'return_class' => '',
 		'footer_class' => '',			
 		'footer_hook' => '',
@@ -74,6 +76,12 @@ class FooterCredits {
  			//suppress footer output
  			if ($ffs = self::get_option('footer_filter_hook')) 
  				add_filter($ffs, array(self::CLASSNAME, 'no_footer'),100); 
+
+			if (is_page('privacy') && self::get_term('privacy_contact'))
+				add_filter('the_content', array(self::CLASSNAME, 'add_privacy_footer'),9 );	
+
+			if (is_page('terms') && self::get_term('terms_contact'))
+				add_filter('the_content', array(self::CLASSNAME, 'add_terms_footer'),9 );	
 
 			if (is_page('terms') || is_page('privacy') || is_page('affiliates') || is_page('disclaimer'))
 				add_filter('the_content', array(self::CLASSNAME, 'terms_filter') );	
@@ -171,7 +179,7 @@ class FooterCredits {
    			case 'copyright' : $default = self::get_copyright(self::get_term('copyright_start_year')); break;
    			case 'copyright_start_year': $default = date('Y'); break;
    			case 'country' : $default = 'The United States'; break;
-   			case 'courts' : $default = ucwords(sprintf('the courts of %1$s',self::get_option('country'))); break;
+   			case 'courts' : $default = ucwords(sprintf('the courts of %1$s',self::get_term('country'))); break;
    			case 'email' : $default = 'privacy@'.strtolower(self::get_term('site')); break;
    			case 'site' : $default = self::get_default_site(); break;
    			case 'updated' : $default = date('d M Y'); break;
@@ -212,12 +220,11 @@ class FooterCredits {
     }	
 	
 	static function footer_menu($menu) {
-        return self::filter_links(wp_nav_menu(array('menu' => $menu, 'echo' => false, 'container' => false)));
+        return wp_nav_menu(array('menu' => $menu, 'echo' => false, 'container' => false));
 	}
 
-	static function return_to_top( $text, $href, $class) {
-		if ('#'==$href) $href = self::$defaults['return_href'];
-		return sprintf( '<div class="%1$s"><a href="%2$s" rel="nofollow">%3$s</a></div>', trim($class), esc_url( $href), $text);
+	static function return_to_top( $text, $class) {
+		return sprintf( '<div class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
 	}
 
 
@@ -238,16 +245,18 @@ class FooterCredits {
 		}	
 		$copyright = self::copyright_owner(self::get_terms());
 		$telephone = self::get_term('telephone');			
+		$email = self::get_term('email');	
 		$address = self::get_term('address');
 		return (empty($params['show_return']) ? '' :
-			self::return_to_top($params['return_text'], $params['return_href'], $params['return_class'])) . 
-			sprintf('<div id="%1$s" class="%2$s">%3$s%4$s%5$s%6$s</div>%7$s<!-- end #%1$s -->', 
+			self::return_to_top($params['return_text'], $params['return_class'])) . 
+			sprintf('<div id="%1$s" class="%2$s">%3$s%4$s%5$s%6$s%7$s</div>%8$s<!-- end #%1$s -->', 
 				self::CODE,
 				$params['footer_class'], 	
 				(empty($params['nav_menu']) ? '' : self::footer_menu($params['nav_menu'])), 
 				(empty($params['show_copyright']) ? '' : sprintf('%1$s%2$s', $section_separator, $copyright)),
 				((empty($address) || empty($params['show_address'])) ? '' : sprintf('%1$s<span class="address">%2$s%3$s</span>', $item_separator, self::format_address($address, $params['separator']), self::get_term('country')) ),
 				((empty($telephone) || empty($params['show_telephone'])) ? '' : sprintf('%1$s<span class="telephone">%2$s</span>', $section_separator, $telephone) ),
+				((empty($email) || empty($params['show_email'])) ? '' : sprintf('%1$s<span class="email">%2$s</span>', $section_separator, $email) ),
 				$clear				
 			);				
 	}
@@ -279,24 +288,7 @@ class FooterCredits {
 		}
 	}
 
-    static function no_footer($content) { return ''; }
-         
-    static function add_footer_filter() {
- 		add_filter('wp_list_bookmarks', array(self::CLASSNAME,'filter_links'),20); //nofollow links in custom footer widgets
-    }    
-         
-    static function filter_links( $content) {
-		return preg_replace_callback( '/<a([^>]*)>(.*?)<\/a[^>]*>/is', array( self::CLASSNAME, 'nofollow_link' ), $content );
-    }		
-
-    static function nofollow_link($matches) { //make link nofollow
-		$attrs = shortcode_parse_atts( stripslashes ($matches[ 1 ]) );
-		if (isset($attrs['rel'])) return $matches[ 0 ];  //skip if already has a rel attribute
-		$atts='';
-		foreach ( $attrs AS $key => $value ) $atts .= sprintf('%1$s="%2$s" ', $key, $value);
-		$atts = substr( $atts, 0, -1 );
-		return sprintf('<a rel="nofollow" %1$s>%2$s</a>', $atts, $matches[ 2 ]);
-	}
+    static function no_footer($content) { return ''; }  		
 
 	static function is_terms_key($key) {
 		return array_key_exists($key, self::$defaults['terms']);
@@ -310,6 +302,8 @@ class FooterCredits {
 				self::$defaults['footer_hook'] = 'twentyeleven_credits'; break;
 			case 'twentytwelve': 
 				self::$defaults['footer_hook'] = 'twentytwelve_credits'; break;
+			case 'twentythirteen': 
+				self::$defaults['footer_hook'] = 'twentythirteen_credits'; break;
 			case 'delicate': 
 				self::$defaults['footer_hook'] = 'get_footer'; break;
 			case 'genesis': 
@@ -326,7 +320,47 @@ class FooterCredits {
 				self::$defaults['footer_remove'] = false;				
 				break;
 		}
-	}	
+	}
+
+	static function add_privacy_footer($content) {
+		$email = self::get_term('email');	
+		$address = self::get_term('address');
+		$country = self::get_term('country');
+		$owner = self::get_term('owner');
+		$contact = <<< PRIVACY
+<h2>How to Contact Us</h2> 
+<p>Questions about this statement or about our handling of your information may be sent by email to <a href="mailto:{$email}">{$email}</a>, or by post to {$owner} Privacy Office, {$address} {$country}. </p>
+PRIVACY;
+		return (strpos($content,'%%') == FALSE) ? ($content . $contact) : $content;
+	}
+
+	static function add_terms_footer($content) {
+		$email = self::get_term('email');	
+		$address = self::get_term('address');
+		$country = self::get_term('country');
+		$courts = self::get_term('courts');
+		$owner = self::get_term('owner');
+		$copyright = self::get_term('copyright');
+		$updated = self::get_term('updated');
+		$terms_contact = self::get_term('terms_contact');
+		$disputes = <<< DISPUTES
+<h2>Dispute Resolution</h2>
+<p>These terms, and any dispute arising from the use of this site, will be governed by {$courts} without regard to its conflicts of laws provisions.</p>
+DISPUTES;
+		$terms = <<< TERMS
+<h2>Feedback And Information</h2> 
+<p>Any feedback you provide at this site shall be deemed to be non-confidential. {$owner} shall be free to use such information on an unrestricted basis.</p>
+<p>The terms and conditions for this web site are subject to change without notice.<p>
+<p>{$copyright} {$owner} All rights reserved.<br/> {$owner}, {$address} {$country}</p>
+<p>Updated by The {$owner} Legal Team on {$updated}</p>
+TERMS;
+		if (strpos($content,'%%') == FALSE) {
+			$content .= $courts ? $disputes : '';
+			$content .= $address ? $terms : '';
+		}
+		return $content ;
+	}
+
 }
 
 class Footer_Putter_Copyright_Widget extends WP_Widget {
@@ -351,6 +385,7 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		$instance['nav_menu'] = !empty($new_instance['nav_menu']) ? $new_instance['nav_menu'] : 0;
 		$instance['show_copyright'] = !empty($new_instance['show_copyright']) ? 1 : 0;
 		$instance['show_telephone'] = !empty($new_instance['show_telephone']) ? 1 : 0;	
+		$instance['show_email'] = !empty($new_instance['show_email']) ? 1 : 0;	
 		$instance['show_address'] = !empty($new_instance['show_address']) ? 1 : 0;	
 		$instance['center'] = !empty($new_instance['center']) ? 1 : 0;
 		$instance['two_lines'] = !empty($new_instance['two_lines']) ? 1 : 0;	
@@ -373,6 +408,7 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		$two_lines = isset( $instance['two_lines'] ) ? (bool) $instance['two_lines'] : false;
 		$show_copyright = isset( $instance['show_copyright'] ) ? (bool) $instance['show_copyright'] : false;
 		$show_address = isset( $instance['show_address'] ) ? (bool) $instance['show_address'] : false;
+		$show_email = isset( $instance['show_email'] ) ? (bool) $instance['show_email'] : false;
 		$show_telephone = isset( $instance['show_telephone'] ) ? (bool) $instance['show_telephone'] : false;
 		$show_return = isset( $instance['show_return'] ) ?  (bool) $instance['show_return'] : false;
 		$return_class = isset( $instance['return_class'] ) ? $instance['return_class'] : '';		
@@ -401,6 +437,8 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		<label for="<?php echo $this->get_field_id('show_address'); ?>"><?php _e( 'Show Address', self::DOMAIN  ); ?></label><br />
 		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_telephone', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_telephone'); ?>"<?php checked( $show_telephone ); ?> />
 		<label for="<?php echo $this->get_field_id('show_telephone'); ?>"><?php _e( 'Show Telephone number', self::DOMAIN  ); ?></label><br />
+		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_email', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_email'); ?>"<?php checked( $show_email ); ?> />
+		<label for="<?php echo $this->get_field_id('show_email'); ?>"><?php _e( 'Show Email Address', self::DOMAIN  ); ?></label><br />
 		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_return', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_return'); ?>"<?php checked( $show_return ); ?> />
 		<label for="<?php echo $this->get_field_id('show_return'); ?>"><?php _e( 'Show Return To Top Link' ); ?></label><br />
 		<h4>Custom Classes (Optional)</h4>

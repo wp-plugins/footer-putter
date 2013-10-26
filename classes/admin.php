@@ -68,32 +68,28 @@ The plugins define two widgets:
 <li>a <b>Footer Copyright Widget</b> that places a line at the foot of your site containing as many of the items listed above that you want to disclose.</li>
 <li>a <b>Trademarks Widget</b> that displays a line of trademarks that you have previously set up as "Links".
 </ol>
-<p>All footer links are rel=nofollow in line with best SEO recommendations.</p>
 <p>Typically you will drag both widgets into the Custom Footer Widget Area.</p>
-<p>Your footer will look something like this:</p>
-<img src="{$screenshot}" alt="Screenshot of Footer Credits Widget Area" />
 
-<h2>Instructions For WP Whoosh Users</h2>
-<p>If you have <a href="http://www.wpwhoosh.com/">whooshed</a> this site then all you need to do is replace the sample trademarks with the real trademarks.
-
-<h2>Instructions For Other Users</h2>
+<h2>Instructions For Building A Footer</h2>
 <ol>
-<li>Create a <i>Privacy Policy</i> page with no sidebar and set robots meta as noindex, noarchive.</li>
-<li>Create a <i>Terms of Use</i> page with no sidebar and set robots meta as noindex, noarchive.</li>
+<li>Create a <i>Privacy Policy</i> page with the slug/permalink <em>privacy</em>, choose a page template with no sidebar.</li>
+<li>Create a <i>Terms of Use</i> page with the slug/permalink <em>terms</em>, choose a page template with no sidebar.</li>
 <li>Create a <i>Contact</i> page with a contact form.</li>
-<li>Create a WordPress menu <i>Footer Menu</i> with the above 3 pages.</li>
-<li>Go to <a href="{$footer_url}">Footer Credits</a> and update the Site Owner details and set the Footer Hook according to your choice of WordPress theme.</li>
+<li>Create an <i>About</i> page, with information either about the site or about its owner.</li>
+<li>If the site is selling an information product you may want to create a <i>Disclaimer</i> page, regarding any claims about the product performance.</li>
+<li>Create a WordPress menu called <i>Footer Menu</i> with the above pages.</li>
+<li>Go to <a href="{$footer_url}">Footer Credits</a> and update the Site Owner details, contact and legal information.</li>
 <li>Drag a <i>Footer Copyright Widget</i> into the <i>Custom Footer Widget Area</i> and select the <i>Footer Menu</i> and optional text if you want to have a "Return To Top" link</li>
 <li>Add a link for each of your trademarks and put each in a <i>Trademarks</i> link category - you can call this link category as you like</li>
 <li>Drag a Trademarks widget into the Custom Footer Widget and choose your <i>Trademarks</i> link category</li>
+<li>Review the footer of the site. You may want to change font and background colors which you can set in the widget controls, or make adjustments using the Footer hook as described below.</li>
 </ol>
 
 <h3>Footer Hook</h3>
-
 <p>The footer hook is only required if your theme does not already have a footer widget area into which you can drag the two widgets.</p>
-
 <p>For some themes, the footer hook is left blank, for others use a WordPress hook such as <i>get_footer</i> or <i>wp_footer</i>, 
-or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
+or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, 
+<i>twentythirteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
 
 <h3>Getting Help</h3>
 <p>Check out the <a href="{$home_url}">Footer Putter Plugin page</a> for more information about the plugin.</p> 

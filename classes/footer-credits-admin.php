@@ -9,33 +9,32 @@ class FooterCreditsAdmin {
     private static $parenthook;
     private static $slug;
     private static $screen_id;
-    private static $keys = array('owner', 'site', 'address', 'country', 'telephone', 
-				'email', 'courts', 'updated', 'copyright_start_year', 'return_text', 'return_href', 'return_class',
-				'footer_class','footer_hook','footer_remove','footer_filter_hook','enable_html5');
+    private static $keys;
 	private static $tips = array(
 			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'), 
 			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'), 
 			'country' => array('heading' => 'Country', 'tip' => 'Enter the country where the legal entity is domiciled.'), 
 			'telephone' => array('heading' => 'Telephone Number', 'tip' => 'Enter a telephone number here if you want it to appear in the footer of the installed site.'), 
-			'email' => array('heading' => 'Email Address', 'tip' => 'Enter the email address here if you want it to appear in the privacy statement.'), 
+			'email' => array('heading' => 'Email Address', 'tip' => 'Enter the email address here if you want it to appear in the footer and in the privacy statement.'), 
 			'courts' => array('heading' => 'Legal Jurisdiction' , 'tip' => 'The Courts that have jurisdiction over any legal disputes regarding this site. For example: <i>the state and federal courts in Santa Clara County, California</i>, or <i>the Law Courts of England and Wales</i>'),
 			'updated' => array('heading' => 'Last Updated' , 'tip' => 'This will be defaulted as today. For example, Oct 23rd, 2012'),
 			'copyright_start_year' => array('heading' => 'Copyright Start' , 'tip' => 'The start year of the business appears in the copyright statement in the footer and an on the Terms and Conditions page.'),
 			'return_text' => array('heading' => 'Link Text' , 'tip' => 'The text of the Return To Top link. For example, <i>Return To Top</i> or <i>Back To Top</i>.'),
-			'return_href' => array('heading' => 'Link Anchor' , 'tip' => 'The destination of the Return To Top link. This depends on our theme and also whether you want to go to the top of the page or the top of the content section. Typical values are #content, #header, #top, #page, #wrap or #container.'),
 			'return_class' => array('heading' => 'Return To Top Class' , 'tip' => 'Add any custom class you want to apply to the Return To Top link.'),
 			'footer_class' => array('heading' => 'Footer Class' , 'tip' => 'Add any custom class you want to apply to the footer. The plugin comes with a class <i>white</i> that marks the text in the footer white. This is useful where the footer background is a dark color.'),
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
 			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
 			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.'),
-			'enable_html5' => array('heading' => 'Enable HTML5' , 'tip' => 'Use the HTML5 &lt;footer&gt; element for the custom footer widget area.')
+			'enable_html5' => array('heading' => 'Enable HTML5' , 'tip' => 'Use the HTML5 &lt;footer&gt; element for the custom footer widget area.'),
+			'privacy_contact' => array('heading' => 'Add Privacy Contact?', 'tip' => 'Add a section to the end of the privacy statement with contact information'),
+			'terms_contact' => array('heading' => 'Add Terms Contact?', 'tip' => 'Add a section to the end of the Terms and Conditions page with contact and legal information'),
 	);
 	private static $tooltips;
 
 	public static function init($parent) {
 		self::$version = FooterCredits::VERSION;
 		self::$parenthook = $parent;
-	    self::$slug = self::$parenthook . '-' . self::SLUG;
+	    self::$slug = self::$parenthook . '-' . self::SLUG;  
 		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
 	}
 	
@@ -90,6 +89,7 @@ class FooterCreditsAdmin {
 		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_action('admin_enqueue_scripts', array(self::CLASSNAME, 'enqueue_styles'));
  		add_action('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
+	    self::$keys = array_keys(self::$tips);	
 		self::$tooltips = new DIYTooltip(self::$tips);
 	}
 
@@ -116,7 +116,6 @@ class FooterCreditsAdmin {
 				if (call_user_func(array(self::FOOTER, 'is_terms_key'),$option))
 					$options['terms'][$option] = $val;
  				else switch($option) {
- 					case 'return_href': $options[$option] = '#'.preg_replace('/\W/','',$val); break;
 					case 'footer_remove' : $options[$option] = !empty($val); break;
  					case 'footer_hook': 
  					case 'footer_filter_hook': $options[$option] = preg_replace('/\W/','',$val); break;
@@ -165,10 +164,13 @@ INTRO_PANEL;
 		$tip1 = self::$tooltips->tip('owner');	
 		$tip2 = self::$tooltips->tip('address');
 		$tip3 = self::$tooltips->tip('country');					
+		$tip4 = self::$tooltips->tip('privacy_contact');
+		$privacy_contact = $terms['privacy_contact'] ? 'checked="checked"' : '';	
 		print <<< OWNER_PANEL
 <label>{$tip1}</label><input type="text" name="owner" size="25" value="{$terms['owner']}" /><br/>
 <label>{$tip2}</label><input type="text" name="address" size="80" value="{$terms['address']}" /><br/>
 <label>{$tip3}</label><input type="text" name="country" size="25" value="{$terms['country']}" /><br/>
+<label>{$tip4}</label><input type="checkbox" name="privacy_contact" {$privacy_contact} value="1" /><br/>
 OWNER_PANEL;
 	}	
     
@@ -187,20 +189,21 @@ CONTACT_PANEL;
 		$tip1 = self::$tooltips->tip('courts');
 		$tip2 = self::$tooltips->tip('updated');
 		$tip3 = self::$tooltips->tip('copyright_start_year');			
+		$tip4 = self::$tooltips->tip('terms_contact');
+		$terms_contact = $terms['terms_contact'] ? 'checked="checked"' : '';	
 		print <<< LEGAL_PANEL
 <label>{$tip1}</label><input type="text" name="courts" size="80" value="{$terms['courts']}" /><br/>
 <label>{$tip2}</label><input type="text" name="updated" size="20" value="{$terms['updated']}" /><br/>
 <label>{$tip3}</label><input type="text" name="copyright_start_year" size="5" value="{$terms['copyright_start_year']}" /><br/>
+<label>{$tip4}</label><input type="checkbox" name="terms_contact" {$terms_contact} value="1" /><br/>
 LEGAL_PANEL;
 	}
 
  	public static function return_panel($post,$metabox){		
 		$options = $metabox['args']['options'];	 	
 		$tip1 = self::$tooltips->tip('return_text');
-		$tip2 = self::$tooltips->tip('return_href');
 		print <<< RETURN_PANEL
 <label>{$tip1}</label><input type="text" name="return_text" size="20" value="{$options['return_text']}" /><br/>
-<label>{$tip2}</label><input type="text" name="return_href" size="20" value="{$options['return_href']}" /><br/>
 RETURN_PANEL;
 	}
 
@@ -222,7 +225,7 @@ RETURN_PANEL;
 <p>You can place the Copyright and Trademark widgets in any existing widget area. However, if your theme does not have a suitably located widget area in the footer then you can create one by specifying the hook
 where the Widget Area will be located.</p>
 <p>You may use a standard WordPress hook like <i>get_footer</i> or <i>wp_footer</i> or choose a hook that is theme-specific such as <i>twentyten_credits</i>, 
-<i>twentyeleven_credits</i> or <i>twentytwelve_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
+<i>twentyeleven_credits</i>, <i>twentytwelve_credits</i> or <i>twentythirteen_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
 the hook <i>genesis_footer</i> or maybe <i>genesis_after</i>. See what looks best. Click for <a href="{$url}">suggestions of which hook to use for common WordPress themes</a>.</p> 
 <label>{$tip1}</label><input type="text" name="footer_hook" size="30" value="{$options['footer_hook']}" /><br/>
 <label>{$tip2}</label><input type="checkbox" name="footer_remove" {$footer_remove}value="1" /><br/>
