@@ -28,7 +28,7 @@ class Footer_Putter_TradeMark_Widget extends WP_Widget {
 			'limit' => $limit,
 		)));
 		echo $before_widget;
-		echo FooterCredits::filter_links($links);
+		echo $links;
 		echo $after_widget;
 	}
 
