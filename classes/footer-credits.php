@@ -1,14 +1,15 @@
 <?php
 class FooterCredits {
-    const CLASSNAME = 'FooterCredits'; //name of class - must be same as line above - hard code for performance
-    const DOMAIN = 'FooterCredits'; //text domain for translation
     const CODE = 'footer-credits'; //element prefix
 	const OPTIONS_NAME = 'footer_credits_options'; 
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.5';
+	const VERSION = '1.7';
     private static $version;
-	protected static $options  = array();
-	protected static $defaults  = array(
+
+	protected static $is_html5 = false;
+	protected static $is_landing = false;
+	protected static $options = array();
+	protected static $defaults = array(
 		'terms' => array(
 			'site' => '',
 			'owner' => '',
@@ -37,81 +38,80 @@ class FooterCredits {
 		'footer_hook' => '',
 		'footer_remove' => true,
  		'footer_filter_hook' => '',
- 		'enable_html5' => false
+ 		'visibility' => ''
 	);
-
+	
     private static function get_version(){
 		return self::$version;
 	}
 	
-	static function init() {
+	public static function init() {
 		self::$version = self::VERSION;
+		self::$is_html5 = function_exists('current_theme_supports') && current_theme_supports('html5'); 
 		self::theme_specific_defaults();
-		add_action('widgets_init',array(self::CLASSNAME,'register'),20);		
-		add_filter( 'wp_nav_menu_items', array(self::CLASSNAME, 'fix_home_link'), 10, 2 );
-		if (!is_admin()) add_action('wp',array(self::CLASSNAME,'prepare'));	
+		add_action('widgets_init',array(__CLASS__,'register'),20);		
+		add_filter( 'wp_nav_menu_items', array(__CLASS__, 'fix_home_link'), 10, 2 );
+		if (!is_admin()) add_action('wp',array(__CLASS__,'prepare'));	
 	}
 
-	static function register() {
+	public static function register() {
 		self::register_sidebars();
 		self::register_widgets();
 	}
 
-	static function prepare() {
-		if (!is_admin()) {
-			add_shortcode(self::CODE.'-copyright', array(self::CLASSNAME, 'copyright_owner' ) );
-			add_shortcode(self::CODE.'-menu', array(self::CLASSNAME, 'footer_menu' ) );
-			add_shortcode(self::CODE, array(self::CLASSNAME, 'footer' ) );
+	public static function prepare() {
+		add_shortcode(self::CODE.'-copyright', array(__CLASS__, 'copyright_owner' ) );
+		add_shortcode(self::CODE.'-menu', array(__CLASS__, 'footer_menu' ) );
+		add_shortcode(self::CODE, array(__CLASS__, 'footer' ) );
+		add_filter('widget_text', 'do_shortcode', 11);
+		add_action('wp_enqueue_scripts',array(__CLASS__, 'enqueue_styles' ));
 
-			add_filter('widget_text', 'do_shortcode', 11);		
-
-			add_action('wp_enqueue_scripts',array(self::CLASSNAME, 'add_styles' ));
+		self::$is_landing = is_page_template('page_landing.php');
 			
-			//insert custom footer at specified hook
-			if ($footer_hook = self::get_option('footer_hook'))  {
-				if (self::get_option('footer_remove')) remove_all_actions( $footer_hook); 
-				add_action( $footer_hook, array(self::CLASSNAME, 'custom_footer')); 
-			}
-	
- 			//suppress footer output
- 			if ($ffs = self::get_option('footer_filter_hook')) 
- 				add_filter($ffs, array(self::CLASSNAME, 'no_footer'),100); 
-
-			if (is_page('privacy') && self::get_term('privacy_contact'))
-				add_filter('the_content', array(self::CLASSNAME, 'add_privacy_footer'),9 );	
-
-			if (is_page('terms') && self::get_term('terms_contact'))
-				add_filter('the_content', array(self::CLASSNAME, 'add_terms_footer'),9 );	
-
-			if (is_page('terms') || is_page('privacy') || is_page('affiliates') || is_page('disclaimer'))
-				add_filter('the_content', array(self::CLASSNAME, 'terms_filter') );	
+		//insert custom footer at specified hook
+		if ($footer_hook = self::get_option('footer_hook'))  {
+			if (self::get_option('footer_remove')) remove_all_actions( $footer_hook); 
+			add_action( $footer_hook, array(__CLASS__, 'custom_footer')); 
 		}
-	}
+	
+ 		//suppress footer output
+ 		if ($ffs = self::get_option('footer_filter_hook')) 
+ 			add_filter($ffs, array(__CLASS__, 'no_footer'),100); 
 
-    static function register_sidebars() {
+		if (is_page('privacy') && self::get_term('privacy_contact'))
+			add_filter('the_content', array(__CLASS__, 'add_privacy_footer'),9 );	
+
+		if (is_page('terms') && self::get_term('terms_contact'))
+			add_filter('the_content', array(__CLASS__, 'add_terms_footer'),9 );	
+
+		if (is_page('terms') || is_page('privacy') || is_page('affiliates') || is_page('disclaimer'))
+			add_filter('the_content', array(__CLASS__, 'terms_filter') );	
+				
+	}
+	
+    private static function register_sidebars() {
     	if (self::get_option('footer_hook')) {
-			$tag = self::get_option('enable_html5') ? 'section' : 'div';
+			$tag = self::$is_html5 ? 'section' : 'div';
 			register_sidebar( array(
 				'id' => self::SIDEBAR_ID,
-				'name'	=> __( 'Credibility Footer', self::CLASSNAME ),
-				'description' => __( 'Custom footer section for copyright, trademarks, etc', self::CLASSNAME),
+				'name'	=> __( 'Credibility Footer', __CLASS__ ),
+				'description' => __( 'Custom footer section for copyright, trademarks, etc', __CLASS__),
 				'before_widget' => '<'.$tag.' id="%1$s" class="widget %2$s"><div class="widget-wrap">',
 				'after_widget'  => '</div></'.$tag.'>'				
 			) );
 		}
     }
 	
-	static function register_widgets() {
+	private static function register_widgets() {
 		register_widget( 'Footer_Putter_Copyright_Widget' );
 		register_widget( 'Footer_Putter_TradeMark_Widget' );
 	}	
 	
-	
-	static function add_styles() {
-		wp_enqueue_style(self::CLASSNAME, plugins_url('styles/footer-credits.css',dirname(__FILE__)), array(), self::get_version());
+	public static function enqueue_styles() {
+		wp_enqueue_style(__CLASS__, plugins_url('styles/footer-credits.css',dirname(__FILE__)), array(), self::get_version());
     }
 
-	static function fix_home_link( $content, $args) {
+	public static function fix_home_link( $content, $args) {
 		$class =  is_front_page()? ' class="current_page_item"' : '';
 		$home_linktexts = array('Home','<span>Home</span>');
 		foreach ($home_linktexts as $home_linktext) {
@@ -122,14 +122,14 @@ class FooterCredits {
 		return $content;
 	}
 
-	static function sanitize_terms($new_terms) {
+	private static function sanitize_terms($new_terms) {
 		$new_terms = wp_parse_args($new_terms, self::$defaults['terms']); //ensure terms are complete		
 		$new_terms['site'] = self::get_default_site();
 		$new_terms['copyright'] = self::get_copyright($new_terms['copyright_start_year']); //generate copyright
 		return $new_terms;
 	}
 
-	static function save($new_options) {
+	public static function save($new_options) {
 		$options = self::get_options(false);
 		$new_options = wp_parse_args( $new_options, $options);
 		$new_options['terms'] = self::sanitize_terms($new_options['terms']);
@@ -138,7 +138,7 @@ class FooterCredits {
 		return $updated;
 	}	
 
-	static function get_options ($cache = true) {
+	public static function get_options ($cache = true) {
 	   if ($cache && (count(self::$options) > 0)) return self::$options;
 	
 	   $the_options = array();
@@ -151,7 +151,7 @@ class FooterCredits {
 	   return self::$options;
 	}
 	
-	static function get_option($option_name) {
+	public static function get_option($option_name) {
     	$options = self::get_options();
     	if ($option_name && $options && array_key_exists($option_name,$options))
         	return $options[$option_name];
@@ -159,11 +159,11 @@ class FooterCredits {
         	return false;
     }
     
- 	static function get_terms() {
+ 	private static function get_terms() {
     	return self::get_option('terms');
     }   
 	
-	static function get_term($term_name) {
+	private static function get_term($term_name) {
     	$options = self::get_options();
     	$terms = is_array($options) && array_key_exists('terms',$options) ? $options['terms'] : false;
     	if ($term_name && $terms && array_key_exists($term_name,$terms) && $terms[$term_name])
@@ -172,7 +172,7 @@ class FooterCredits {
         	return self::get_default_term($term_name);    		
     }	
 	
-    static function get_default_term($key) {
+    private static function get_default_term($key) {
 		$default='';
     	switch ($key) {
    			case 'owner' : $default = self::get_term('site'); break;
@@ -188,20 +188,20 @@ class FooterCredits {
    		return $default;
     }
 	
-	static function get_default_site() { 
+	private static function get_default_site() { 
 		$domain = strtolower(parse_url(site_url(),PHP_URL_HOST));
 		$p = strpos($domain,'www.') ;
 		if (($p !== FALSE) && ($p == 0)) $domain = substr($domain,4);
 		return $domain; 
 	}
 	
-	static function get_copyright($startyear){
+	public static function get_copyright($startyear){
   		$thisyear = date("Y");
 		if(empty( $startyear)) $startyear = $thisyear;
   		return sprintf('Copyright &copy; %1$s%2$s', $startyear, $thisyear == $startyear ? '' : ("-".$thisyear));
 	}
 
-	static function copyright_owner($attr){
+	public static function copyright_owner($attr){
 		$defaults['owner'] = self::get_term('owner');
 		$defaults['copyright_start_year'] = self::get_term('copyright_start_year');		
   		$params = shortcode_atts( $defaults, $attr ); //apply plugin defaults  		
@@ -209,7 +209,7 @@ class FooterCredits {
   			self::get_copyright($params['copyright_start_year']), $params['owner']);
 	}	
 	
-    static function format_address ($address, $separator) {
+    private static function format_address ($address, $separator) {
 		$s='';
 		$addlines = explode(',', trim($address));
 		foreach ($addlines as $a) {
@@ -219,17 +219,17 @@ class FooterCredits {
 		return $s;
     }	
 	
-	static function footer_menu($menu) {
+	public static function footer_menu($menu) {
         return wp_nav_menu(array('menu' => $menu, 'echo' => false, 'container' => false));
 	}
 
-	static function return_to_top( $text, $class) {
-		return sprintf( '<div class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
+	public static function return_to_top( $text, $class) {
+		return sprintf( '<div id="footer-return" class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
 	}
 
-
-	static function footer($atts = array()) {
+	public static function footer($atts = array()) {
   		$params = shortcode_atts( self::get_options(), $atts ); //apply plugin defaults   
+		
 		if ($params['center']) {
 			$section_separator = '&nbsp;';
 			$item_separator = $params['two_lines'] ? '<br/>' : $params['separator'];
@@ -256,12 +256,12 @@ class FooterCredits {
 				(empty($params['show_copyright']) ? '' : sprintf('%1$s%2$s', $section_separator, $copyright)),
 				((empty($address) || empty($params['show_address'])) ? '' : sprintf('%1$s<span class="address">%2$s%3$s</span>', $item_separator, self::format_address($address, $params['separator']), self::get_term('country')) ),
 				((empty($telephone) || empty($params['show_telephone'])) ? '' : sprintf('%1$s<span class="telephone">%2$s</span>', $section_separator, $telephone) ),
-				((empty($email) || empty($params['show_email'])) ? '' : sprintf('%1$s<span class="email">%2$s</span>', $section_separator, $email) ),
+				((empty($email) || empty($params['show_email'])) ? '' : sprintf('%1$s<span class="email"><a href="mailto:%2$s">%2$s</a></span>', $section_separator, $email) ),
 				$clear				
 			);				
 	}
 
-	static function terms_filter($content) {
+	public static function terms_filter($content) {
 		if ($terms = self::get_terms()) {
 			$from = array();
 			$to = array();
@@ -274,9 +274,9 @@ class FooterCredits {
 		return $content;
 	}
 
-	static function custom_footer() {
+	public static function custom_footer() {
 		if ( is_active_sidebar( self::SIDEBAR_ID) ) {
-			if (self::get_option('enable_html5')) {
+			if (self::$is_html5) {
 				echo '<footer class="custom-footer" role="contentinfo" itemscope="" itemtype="http://schema.org/WPFooter">';
 				dynamic_sidebar( self::SIDEBAR_ID );
 				echo '</footer><!-- end .custom-footer -->';
@@ -288,13 +288,13 @@ class FooterCredits {
 		}
 	}
 
-    static function no_footer($content) { return ''; }  		
+    public static function no_footer($content) { return ''; }  		
 
-	static function is_terms_key($key) {
+	public static function is_terms_key($key) {
 		return array_key_exists($key, self::$defaults['terms']);
 	}
 	
-	static function theme_specific_defaults() {
+	private static function theme_specific_defaults() {
 		switch (basename( TEMPLATEPATH ) ) {  
 			case 'twentyten': 
 				self::$defaults['footer_hook'] = 'twentyten_credits'; break;
@@ -304,12 +304,13 @@ class FooterCredits {
 				self::$defaults['footer_hook'] = 'twentytwelve_credits'; break;
 			case 'twentythirteen': 
 				self::$defaults['footer_hook'] = 'twentythirteen_credits'; break;
+			case 'twentyfourteen': 
+				self::$defaults['footer_hook'] = 'twentyfourteen_credits'; break;
 			case 'delicate': 
 				self::$defaults['footer_hook'] = 'get_footer'; break;
 			case 'genesis': 
 				self::$defaults['footer_hook'] = 'genesis_footer';
 				self::$defaults['footer_filter_hook'] = 'genesis_footer_output';
-				self::$defaults['enable_html5'] = function_exists('genesis_html5') && genesis_html5();
 				break;
 			case 'graphene': 
 				self::$defaults['footer_hook'] = 'graphene_footer'; break;
@@ -322,7 +323,7 @@ class FooterCredits {
 		}
 	}
 
-	static function add_privacy_footer($content) {
+	public static function add_privacy_footer($content) {
 		$email = self::get_term('email');	
 		$address = self::get_term('address');
 		$country = self::get_term('country');
@@ -334,7 +335,7 @@ PRIVACY;
 		return (strpos($content,'%%') == FALSE) ? ($content . $contact) : $content;
 	}
 
-	static function add_terms_footer($content) {
+	public static function add_terms_footer($content) {
 		$email = self::get_term('email');	
 		$address = self::get_term('address');
 		$country = self::get_term('country');
@@ -361,11 +362,84 @@ TERMS;
 		return $content ;
 	}
 
+	public static function hide_widget($instance) {
+		$hide = false;
+		if (array_key_exists('visibility',$instance))
+			switch ($instance['visibility']) {
+				case 'hide_landing' : $hide = self::$is_landing; break; //hide only on landing pages
+				case 'show_landing' : $hide = ! self::$is_landing; break; //hide except on landing pages
+			}
+		return $hide;
+	}
+
+    public static function get_visibility_options(){
+		return array(
+			'' => 'Show on all pages', 
+			'hide_landing' => 'Hide on landing pages', 
+			'show_landing' => 'Show only on landing pages');
+	}
+	
+	public static function form_field($fld_id, $fld_name, $label, $value, $type, $options = array(), $args = array()) {
+		if ($args) extract($args);
+		$input = '';
+		$label = sprintf('<label for="%1$s">%2$s</label>', $fld_id, __($label));
+		switch ($type) {
+			case 'text':
+				$input .= sprintf('<input type="text" id="%1$s" name="%2$s" value="%3$s" %4$s %5$s %6$s/> %7$s',
+					$fld_id, $fld_name, $value, 
+					isset($size) ? ('size="'.$size.'"') : '', isset($maxlength) ? ('maxlength="'.$maxlength.'"') : '',
+					isset($class) ? ('class="'.$class.'"') : '', isset($suffix) ? $suffix : '');
+				return sprintf('<p>%1$s: %2$s</p>', $label, $input);
+				break;
+			case 'textarea':
+				$input .= sprintf('<textarea id="%1$s" name="%2$s"%3$s%4$s%5$s>%6$s</textarea>',
+					$fld_id, $fld_name, 
+					isset($rows) ? (' rows="'.$rows.'"') : '', isset($cols) ? (' cols="'.$cols.'"') : '',
+					isset($class) ? (' class="'.$class.'"') : '', $value);
+				return sprintf('<p>%1$s: %2$s</p>', $label, $input);
+				break;
+			case 'checkbox':
+				$input .= sprintf('<input type="checkbox" class="checkbox" id="%1$s" name="%2$s" %3$svalue="1"/>',
+					$fld_id, $fld_name, checked($value, '1', false));
+				return sprintf('%1$s%2$s<br/>', $input, $label);
+				break;
+			case 'radio': 
+				$sep = (is_array($args) && array_key_exists('separator', $args)) ? $args['separator'] : '&nbsp;&nbsp;';
+				if (is_array($options)) 
+					foreach ($options as $optkey => $optlabel)
+						$input .= sprintf('<input type="radio" id="%1$s" name="%2$s" %3$s value="%4$s" />&nbsp;%5$s%6$s',
+							$fld_id, $fld_name, checked($optkey, $value, false), $optkey, $optlabel, $sep); 
+				return sprintf('<p>%1$s%2$s</p>', $label, $input);							
+				break;		
+			case 'select': 
+				if (is_array($options)) 
+					foreach ($options as $optkey => $optlabel)
+						$input .= sprintf('<option%1$s value="%2$s">%3$s</option>',
+							selected($optkey, $value, false), $optkey, $optlabel); 
+				return sprintf('<p>%1$s: %2$s</p>', $label, self::selector($fld_id, $fld_name, $value, $options));							
+				break;		
+		}
+	}
+
+	private static function selector($fld_id, $fld_name,  $value, $options) {
+		$input = '';
+		if (is_array($options)) 
+			foreach ($options as $optkey => $optlabel)
+				$input .= sprintf('<option%1$s value="%2$s">%3$s</option>',
+					selected($optkey, $value, false), $optkey, $optlabel); 
+		return sprintf('<select id="%1$s" name="%2$s">%3$s</select>', $fld_id, $fld_name, $input);							
+	}
+
 }
 
 class Footer_Putter_Copyright_Widget extends WP_Widget {
 
 	const DOMAIN = 'FooterCredits';
+
+    private	$defaults = array( 
+    	'nav_menu' => 0, 'center' => true, 'two_lines' => true,  
+		'show_copyright' => true, 'show_address' => true, 'show_telephone' => true, 'show_email' => false,
+		'show_return' => true, 'return_class' => '', 'footer_class' => '', 'visibility' => '');
 
 	function __construct() {
 		$widget_ops = array( 'description' => __( "A widget displaying menu links, copyright and company details" ) );
@@ -374,10 +448,10 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 	
 	function widget( $args, $instance ) {
 		extract( $args );		
-		$footer_args=array();
-		echo $before_widget;
-		echo FooterCredits::footer($instance);
-		echo $after_widget;
+		if (FooterCredits::hide_widget($instance)) return; //check visibility requirements
+
+		if ($footer = FooterCredits::footer($instance)) 
+			printf ('%1$s%2$s%3$s', $before_widget, $footer, $after_widget);
 	}
 
 	function update( $new_instance, $old_instance ) {
@@ -392,63 +466,47 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		$instance['show_return'] = !empty($new_instance['show_return']) ? 1 : 0;
 		$instance['return_class'] = trim($new_instance['return_class']);
 		$instance['footer_class'] = trim($new_instance['footer_class']);
+		$instance['visibility'] = trim($new_instance['visibility']);
 		return $instance;
 	}
 
 	function form( $instance ) {
-		$menus = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
-		if ( !$menus ) {
-			echo '<p>'. sprintf( __('No menus have been created yet. <a href="%s">Create some</a>.', self::DOMAIN ), admin_url('nav-menus.php') ) .'</p>';
+		$menu_terms = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
+		if ( !$menu_terms ) {
+			echo '<p>'. sprintf( __('No menus have been created yet. <a href="%s">Create some</a>.', GENESIS_CLUB_DOMAIN ), admin_url('nav-menus.php') ) .'</p>';
 			return;
 		}
-		$instance = wp_parse_args( (array) $instance, 
-			array( 'nav_menu' => 0, 'center' => true, 'two_lines' => true,  'show_copyright' => true, 'show_address' => true, 'show_telephone' => true, 'show_return' => true ) );
-		$nav_menu = isset( $instance['nav_menu'] ) ? (int) $instance['nav_menu'] : 0;
-		$center = isset( $instance['center'] ) ? (bool) $instance['center'] : false;
-		$two_lines = isset( $instance['two_lines'] ) ? (bool) $instance['two_lines'] : false;
-		$show_copyright = isset( $instance['show_copyright'] ) ? (bool) $instance['show_copyright'] : false;
-		$show_address = isset( $instance['show_address'] ) ? (bool) $instance['show_address'] : false;
-		$show_email = isset( $instance['show_email'] ) ? (bool) $instance['show_email'] : false;
-		$show_telephone = isset( $instance['show_telephone'] ) ? (bool) $instance['show_telephone'] : false;
-		$show_return = isset( $instance['show_return'] ) ?  (bool) $instance['show_return'] : false;
-		$return_class = isset( $instance['return_class'] ) ? $instance['return_class'] : '';		
-		$footer_class = isset( $instance['footer_class'] ) ? $instance['footer_class'] : '';	
-		?>
-		<p>
-			<label for="<?php echo $this->get_field_id('nav_menu'); ?>"><?php _e('Select Footer Menu:', self::DOMAIN ); ?></label>
-			<select id="<?php echo $this->get_field_id('nav_menu'); ?>" name="<?php echo $this->get_field_name('nav_menu'); ?>">
-		<?php 
-			$selected = empty($nav_menu) ? ' selected="selected"' : '';
-			echo ('<option'.$selected.' value="0">Do not show a menu</option>');
-			foreach ( $menus as $menu ) {
-				$selected = $nav_menu == $menu->term_id ? ' selected="selected"' : '';
-				echo '<option'. $selected .' value="'. $menu->term_id .'">'. $menu->name .'</option>';
-			}
-		?>
-			</select>
-		</p>
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('center', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('center'); ?>"<?php checked( $center ); ?> />
-		<label for="<?php echo $this->get_field_id('center'); ?>"><?php _e( 'Center Menu',self::DOMAIN ); ?></label><br/>
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('two_lines', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('two_lines'); ?>"<?php checked( $two_lines ); ?> />
-		<label for="<?php echo $this->get_field_id('two_lines'); ?>"><?php _e( 'Spread Over Two Lines',self::DOMAIN ); ?></label><br/>
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_copyright', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_copyright'); ?>"<?php checked( $show_copyright ); ?> />
-		<label for="<?php echo $this->get_field_id('show_copyright'); ?>"><?php _e( 'Show Copyright' ); ?></label><br />
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_address', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_address'); ?>"<?php checked( $show_address ); ?> />
-		<label for="<?php echo $this->get_field_id('show_address'); ?>"><?php _e( 'Show Address', self::DOMAIN  ); ?></label><br />
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_telephone', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_telephone'); ?>"<?php checked( $show_telephone ); ?> />
-		<label for="<?php echo $this->get_field_id('show_telephone'); ?>"><?php _e( 'Show Telephone number', self::DOMAIN  ); ?></label><br />
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_email', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_email'); ?>"<?php checked( $show_email ); ?> />
-		<label for="<?php echo $this->get_field_id('show_email'); ?>"><?php _e( 'Show Email Address', self::DOMAIN  ); ?></label><br />
-		<input type="checkbox" class="checkbox" id="<?php echo $this->get_field_id('show_return', self::DOMAIN ); ?>" name="<?php echo $this->get_field_name('show_return'); ?>"<?php checked( $show_return ); ?> />
-		<label for="<?php echo $this->get_field_id('show_return'); ?>"><?php _e( 'Show Return To Top Link' ); ?></label><br />
-		<h4>Custom Classes (Optional)</h4>
-		<p>Add any custom CSS classes you want apply to the footer section content to change the font color and size.</p>
-		<p>For your convenience we have defined 3 classes <i>dark</i>, <i>light</i> and <i>white</i> but feel free
-		to define and use your own custom CSS classes.</p>
-		<label for="<?php echo $this->get_field_id('return_class'); ?>"><?php _e( 'Return To Top:', self::DOMAIN ); ?></label>
-		<input id="<?php echo $this->get_field_id('return_class'); ?>" name="<?php echo $this->get_field_name('return_class'); ?>" type="text" value="<?php echo $return_class; ?>" size="10" /><br/>
-		<label for="<?php echo $this->get_field_id('footer_class'); ?>"><?php _e( 'Footer Credits:', self::DOMAIN ); ?></label>
-		<input id="<?php echo $this->get_field_id('footer_class'); ?>" name="<?php echo $this->get_field_name('footer_class'); ?>" type="text" value="<?php echo $footer_class; ?>" size="10" />
-<?php
+		$menus = array();
+		$menus[0] = 'Do not show a menu';
+		foreach ( $menu_terms as $term ) $menus[ $term->term_id ] = $term->name;
+		
+		$instance = wp_parse_args( (array) $instance, $this->defaults);
+		$this->print_form_field($instance, 'nav_menu', 'Select Footer Menu', 'select', $menus);
+		$this->print_form_field($instance, 'center', 'Center Menu', 'checkbox');
+		$this->print_form_field($instance, 'two_lines', 'Spread Over Two Lines', 'checkbox');
+		$this->print_form_field($instance, 'show_copyright', 'Show Copyright', 'checkbox');
+		$this->print_form_field($instance, 'show_address', 'Show Address', 'checkbox');
+		$this->print_form_field($instance, 'show_telephone', 'Show Telephone number', 'checkbox');
+		$this->print_form_field($instance, 'show_email', 'Show Email Address', 'checkbox');
+		$this->print_form_field($instance, 'show_return', 'Show Return To Top Links', 'checkbox');
+
+		print <<< CUSTOM_CLASSES
+<h4>Custom Classes (Optional)</h4>
+<p>Add any custom CSS classes you want apply to the footer section content to change the font color and size.</p>
+<p>For your convenience we have defined 3 color classes <i>dark</i>, <i>light</i> and <i>white</i>, and 2 size classes, 
+<i>small</i> and <i>tiny</i>. Feel free to use these alongside your own custom CSS classes.</p>
+CUSTOM_CLASSES;
+
+		$this->print_form_field($instance, 'return_class', 'Return To Top', 'text', array(), array('size' => 10));
+		$this->print_form_field($instance, 'footer_class', 'Footer Credits', 'text', array(), array('size' => 10));
+		$this->print_form_field($instance, 'visibility', '<h4>Widget Visibility</h4>', 'radio',
+			FooterCredits::get_visibility_options(), array('separator' => '<br/>'));
 	}
+
+	function print_form_field($instance, $fld, $label, $type, $options = array(), $args = array()) {
+		$value = array_key_exists($fld,$instance) ? $instance[$fld] : false;
+		print FooterCredits::form_field(
+			$this->get_field_id($fld), $this->get_field_name($fld), $label, $value, $type, $options, $args);
+	}
+
 }

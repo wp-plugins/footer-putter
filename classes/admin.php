@@ -1,6 +1,5 @@
 <?php
 class FooterPutterAdmin {
-    const CLASSNAME = 'FooterPutterAdmin'; //this class
     const CODE = 'footer-putter';
     const DOMAIN = 'FooterPutter';
     
@@ -19,8 +18,17 @@ class FooterPutterAdmin {
 	static function init($root) {
 	    self::$slug = $root;
 		add_filter('pre_option_link_manager_enabled', '__return_true' );
-		add_filter('plugin_action_links',array(self::CLASSNAME, 'plugin_action_links'), 10, 2 );
-		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
+		add_filter('plugin_action_links',array(__CLASS__, 'plugin_action_links'), 10, 2 );
+		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
+		add_action('admin_print_styles',array(__CLASS__, 'style_icon'));		
+	}
+
+	public static function style_icon() {
+		print <<< STYLES
+<style type="text/css">
+#adminmenu .menu-icon-generic.toplevel_page_footer-putter div.wp-menu-image:before { content: '\\f346'; }
+</style>
+STYLES;
 	}
 
 	static function plugin_action_links( $links, $file ) {
@@ -33,8 +41,8 @@ class FooterPutterAdmin {
 
 	static function admin_menu() {
 		self::$screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
-			self::get_slug(), array(self::CLASSNAME,'settings_panel'),plugins_url('images/icon-16.png',dirname(__FILE__)) );
-		add_submenu_page(FOOTER_PUTTER_PLUGIN_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'Intro', 'manage_options', FOOTER_PUTTER_PLUGIN_NAME,array(self::CLASSNAME,'settings_panel') );
+			self::get_slug(), array(__CLASS__,'settings_panel') );
+		add_submenu_page(FOOTER_PUTTER_PLUGIN_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'Intro', 'manage_options', FOOTER_PUTTER_PLUGIN_NAME,array(__CLASS__,'settings_panel') );
 	}
 	
 	static function settings_panel() {
@@ -89,7 +97,7 @@ The plugins define two widgets:
 <p>The footer hook is only required if your theme does not already have a footer widget area into which you can drag the two widgets.</p>
 <p>For some themes, the footer hook is left blank, for others use a WordPress hook such as <i>get_footer</i> or <i>wp_footer</i>, 
 or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, 
-<i>twentythirteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
+<i>twentythirteen_credits</i>, <i>twentyfourteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc</p>
 
 <h3>Getting Help</h3>
 <p>Check out the <a href="{$home_url}">Footer Putter Plugin page</a> for more information about the plugin.</p> 

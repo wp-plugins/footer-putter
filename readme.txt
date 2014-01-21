@@ -3,8 +3,8 @@ Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.0
-Tested up to: 3.7
-Stable tag: 1.6
+Tested up to: 3.8
+Stable tag: 1.7
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,9 +18,13 @@ Put a footer on your site that boosts your credibility with both search engines 
 * Include a copyright statement that updates automatically when the year changes - an out of date copyright is a negative signal for Google
 * Include a telephone number to prove you are a real business
 * Include a postal address to prove you are a real business
+* Include a email address to prove you are a real business
 * Supports both a single line centred footer and a multi-line right aligned footer
 * The Footer hook setting allows you to add the footer in just the right place on themes that do not have suitable widget areas 
-* HTML5 support
+* Predefined classes tiny, small, light, dark and white make it easy to change footer size and color if required. 
+* Added widget visibility control: show always, don’t show on landing pages, only show on landing pages.
+* Automatic HTML5 support
+* Can append company contact information to Privacy and Terms and Conditions pages.
 
 == Installation ==
 
@@ -42,6 +46,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.7 = Made email address a mailto link. Added pre-defined classes, tiny and small, to make it easy to use a smaller font size in the footer on pages such as landing pages. Added widget visibility setting to make it easy to either hide or show the footer widgets on landing pages. Replaced the plugin icon image in admin menu with a dashicons font character. Automatically uses HTML5 if theme supports HTML5 - no manual setting required.
 = 1.6 = Add option to include email address in the copyright footer widget, remove the automatic adding of rel=nofollow in footer links, and add optional sub-footer sections to the privacy and terms pages
 = 1.5 = Use Javascript for Return To Top link to make it work on HTML5 sites, and strengthen CSS to ensure footer copyright and trademark widgets are full width
 = 1.4.1 = Reinstate support for PHP 5.2
@@ -53,8 +58,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.6 = 
-* Optional - Add option to include email address in the copyright footer widget
+= 1.7 = 
+* Optional - Additional predefined footer classes and mailto link.
 
 == Links ==
 

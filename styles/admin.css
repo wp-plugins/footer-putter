@@ -6,5 +6,6 @@ div.icon32 { background-image : url(../images/icon-32.png); background-repeat: n
 #poststuff div#message { margin-left: 10px; display: inline; padding: 10px; }
 #poststuff div#message div.updated { margin-left: 30px; padding: 8px; display: inline; }
 #poststuff label { display: inline-block; min-width: 150px; margin-right: 10px;}
-.trademark { vertical-align: top; border: 1px dashed whitesmoke; }
-.trademark:hover { cursor: move; }
+p.notice { font-size: 1.6em; font-weight: bold; }
+p.important { font-size: 1.2em; color: red; }
+img.dashed-border { padding: 10px; border: 1px dashed silver; max-width: 100%; } 
