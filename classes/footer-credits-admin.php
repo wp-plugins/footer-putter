@@ -1,8 +1,6 @@
 <?php
 class FooterCreditsAdmin {
-    const CLASSNAME = 'FooterCreditsAdmin'; //this class
     const CODE = 'footer-credits'; //prefix ID of CSS elements
-    const DOMAIN = 'FooterCredits'; //text domain for translation
     const FOOTER = 'FooterCredits'; //class that builds footer
 	const SLUG = 'footer';
     private static $version;
@@ -25,7 +23,6 @@ class FooterCreditsAdmin {
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
 			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
 			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.'),
-			'enable_html5' => array('heading' => 'Enable HTML5' , 'tip' => 'Use the HTML5 &lt;footer&gt; element for the custom footer widget area.'),
 			'privacy_contact' => array('heading' => 'Add Privacy Contact?', 'tip' => 'Add a section to the end of the privacy statement with contact information'),
 			'terms_contact' => array('heading' => 'Add Terms Contact?', 'tip' => 'Add a section to the end of the Terms and Conditions page with contact and legal information'),
 	);
@@ -35,7 +32,7 @@ class FooterCreditsAdmin {
 		self::$version = FooterCredits::VERSION;
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;  
-		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
+		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
 	}
 	
     private static function get_parenthook(){
@@ -58,10 +55,10 @@ class FooterCreditsAdmin {
 		return self::$keys;
 	}
 	
- 	public static function get_url($id='', $noheader = false) {
-		return admin_url('admin.php?page='.self::get_slug().(empty($id) ? '' : ('&amp;id='.$id)).(empty($noheader) ? '' : '&amp;noheader=true'));
+ 	public static function get_url() {
+		return admin_url('admin.php?page='.self::get_slug());
 	}
-	
+		
 	public static function enable_screen($show_screen,$screen) {
 		if ($screen->id == self::get_screen_id())
 			return true;
@@ -71,8 +68,8 @@ class FooterCreditsAdmin {
 
 	public static function admin_menu() {
 		self::$screen_id =  add_submenu_page(self::get_parenthook(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
-			self::get_slug(), array(self::CLASSNAME,'settings_panel'));
-		add_action('load-'.self::get_screen_id(), array(self::CLASSNAME, 'load_page'));
+			self::get_slug(), array(__CLASS__,'settings_panel'));
+		add_action('load-'.self::get_screen_id(), array(__CLASS__, 'load_page'));
 	}
 
 
@@ -80,15 +77,15 @@ class FooterCreditsAdmin {
  		$message =  isset($_POST['options_update']) ? self::save() : '';	
 		$options = call_user_func(array(self::FOOTER, 'get_options'));
 		$callback_params = array ('options' => $options, 'message' => $message);
-		add_meta_box(self::CODE.'-intro', __('Introduction',self::DOMAIN), array(self::CLASSNAME, 'intro_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-owner', __('Site Owner Details',self::DOMAIN), array(self::CLASSNAME, 'owner_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-contact', __('Contact Details',self::DOMAIN), array(self::CLASSNAME, 'contact_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-legal', __('Legal Details',self::DOMAIN), array(self::CLASSNAME, 'legal_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-return', __('Return To Top',self::DOMAIN), array(self::CLASSNAME, 'return_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-example', __('Preview Footer',self::DOMAIN), array(self::CLASSNAME, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-advanced', __('Advanced',self::DOMAIN), array(self::CLASSNAME, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_action('admin_enqueue_scripts', array(self::CLASSNAME, 'enqueue_styles'));
- 		add_action('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_scripts'));	
+		add_meta_box(self::CODE.'-intro', __('Introduction'), array(__CLASS__, 'intro_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-owner', __('Site Owner Details'), array(__CLASS__, 'owner_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-contact', __('Contact Details'), array(__CLASS__, 'contact_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-legal', __('Legal Details'), array(__CLASS__, 'legal_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-return', __('Return To Top'), array(__CLASS__, 'return_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-example', __('Preview Footer'), array(__CLASS__, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-advanced', __('Advanced'), array(__CLASS__, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_styles'));
+ 		add_action('admin_enqueue_scripts',array(__CLASS__, 'enqueue_scripts'));	
 	    self::$keys = array_keys(self::$tips);	
 		self::$tooltips = new DIYTooltip(self::$tips);
 	}
@@ -103,11 +100,11 @@ class FooterCreditsAdmin {
 		wp_enqueue_script('common');
 		wp_enqueue_script('wp-lists');
 		wp_enqueue_script('postbox');	
-		add_action('admin_footer-'.self::get_screen_id(), array(self::CLASSNAME, 'toggle_postboxes'));
+		add_action('admin_footer-'.self::get_screen_id(), array(__CLASS__, 'toggle_postboxes'));
 	}
 
 	public static function save() {
-		check_admin_referer(self::CLASSNAME);
+		check_admin_referer(__CLASS__);
   		$page_options = explode(',', stripslashes($_POST['page_options']));
   		if ($page_options) {
   			$options = call_user_func(array(self::FOOTER, 'get_options'));
@@ -154,7 +151,7 @@ SCRIPT;
 	public static function intro_panel($post,$metabox){	
 		$message = $metabox['args']['message'];	 	
 		print <<< INTRO_PANEL
-<p>The following information is in the Footer Copyright Widget and if this is a <a target="_blank" href="http://www.wpwhoosh.com">whooshed site</a> on the Privacy Statement and Terms and Conditions pages.</p>
+<p>The following information is used in the Footer Copyright Widget and optionally at the end of the Privacy Statement and Terms and Conditions pages.</p>
 {$message}
 INTRO_PANEL;
 	}
@@ -217,42 +214,39 @@ RETURN_PANEL;
 		$tip1 = self::$tooltips->tip('footer_hook');
 		$tip2 = self::$tooltips->tip('footer_remove');
 		$tip3 = self::$tooltips->tip('footer_filter_hook');
-		$tip4 = self::$tooltips->tip('enable_html5');
 		$url = 'http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks';
 		$footer_remove = $options['footer_remove'] ? 'checked="checked" ' : '';
-		$enable_html5 = $options['enable_html5'] ? 'checked="checked" ' : '';
 		print <<< ADVANCED_PANEL
 <p>You can place the Copyright and Trademark widgets in any existing widget area. However, if your theme does not have a suitably located widget area in the footer then you can create one by specifying the hook
 where the Widget Area will be located.</p>
 <p>You may use a standard WordPress hook like <i>get_footer</i> or <i>wp_footer</i> or choose a hook that is theme-specific such as <i>twentyten_credits</i>, 
-<i>twentyeleven_credits</i>, <i>twentytwelve_credits</i> or <i>twentythirteen_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
+<i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>,<i>twentythirteen_credits</i> or <i>twentyfourteen_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
 the hook <i>genesis_footer</i> or maybe <i>genesis_after</i>. See what looks best. Click for <a href="{$url}">suggestions of which hook to use for common WordPress themes</a>.</p> 
 <label>{$tip1}</label><input type="text" name="footer_hook" size="30" value="{$options['footer_hook']}" /><br/>
 <label>{$tip2}</label><input type="checkbox" name="footer_remove" {$footer_remove}value="1" /><br/>
 <p>If your WordPress theme supplies a filter hook rather than an action hook where it generates the footer, and you want to suppress the theme footer,
 then specify the hook below. For example, entering <i>genesis_footer_output</i> will suppress the standard Genesis child theme footer.</p>
 <label>{$tip3}</label><input type="text" name="footer_filter_hook" size="30" value="{$options['footer_filter_hook']}" /><br/>
-<label>{$tip4}</label><input type="checkbox" name="enable_html5" {$enable_html5}value="1" /><br/>
 ADVANCED_PANEL;
 	}
 
 	public static function settings_panel() {
  		$this_url = $_SERVER['REQUEST_URI'];
 		$keys = implode(',',self::get_keys());
-		$title = sprintf('<h2>%1$s</h2>', __('Footer Credits Settings', self::DOMAIN));
+		$title = sprintf('<h2>%1$s</h2>', __('Footer Credits Settings'));
 		
 ?>
 <div class="wrap">
     <?php screen_icon(); echo $title; ?>
     <div id="poststuff" class="metabox-holder">
-        <div id="post-body">
+        <div id="post-body" class="with-tooltips">
             <div id="post-body-content">
 			<form id="footer_options" method="post" action="<?php echo $this_url; ?>">
 			<?php do_meta_boxes(self::get_screen_id(), 'normal', null); ?>
 			<p class="submit">
 			<input type="submit"  class="button-primary" name="options_update" value="Save Changes" />
 			<input type="hidden" name="page_options" value="<?php echo $keys; ?>" />
-			<?php wp_nonce_field(self::CLASSNAME); ?>
+			<?php wp_nonce_field(__CLASS__); ?>
 			<?php wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); ?>
 			<?php wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false ); ?>
 			</p>

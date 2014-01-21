@@ -1,8 +1,6 @@
 <?php
 class FooterTrademarksAdmin {
-    const CLASSNAME = 'FooterTrademarksAdmin'; //this class
     const CODE = 'footer-putter'; //prefix ID of CSS elements
-    const DOMAIN = 'FooterPutter'; //text domain for translation
 	const SLUG = 'trademarks';
     const FIELDNAME = 'not_on_404';
 
@@ -16,7 +14,7 @@ class FooterTrademarksAdmin {
 		self::$parenthook = $parent;
 	    self::$slug = self::$parenthook . '-' . self::SLUG;
 	    self::$screen_id = self::$parenthook.'_page_' . self::$slug;
-		add_action('admin_menu',array(self::CLASSNAME, 'admin_menu'));
+		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
 	}
 	
     private static function get_version(){
@@ -44,12 +42,12 @@ class FooterTrademarksAdmin {
 
 	public static function admin_menu() {
 		add_submenu_page(self::get_parenthook(), __('Trademarks'), __('Trademarks'), 'manage_options', 
-			self::get_slug(), array(self::CLASSNAME,'settings_panel'));
-		add_action('load-'.self::get_screen_id(), array(self::CLASSNAME, 'load_page'));			
+			self::get_slug(), array(__CLASS__,'settings_panel'));
+		add_action('load-'.self::get_screen_id(), array(__CLASS__, 'load_page'));			
 	}
 
 	public static function load_page() {
- 		add_action ('admin_enqueue_scripts',array(self::CLASSNAME, 'enqueue_styles'));		
+ 		add_action ('admin_enqueue_scripts',array(__CLASS__, 'enqueue_styles'));		
 	}
 
 	public static function enqueue_styles() {
@@ -58,7 +56,7 @@ class FooterTrademarksAdmin {
 
 	public static function settings_panel() {
  		$this_url = $_SERVER['REQUEST_URI'];
-		$title = sprintf('<h2>%1$s</h2>', __('Footer Trademarks', self::DOMAIN));		
+		$title = sprintf('<h2>%1$s</h2>', __('Footer Trademarks'));		
 		$screenshot2 = plugins_url('images/add-link-category.jpg',dirname(__FILE__));		
 		$screenshot3 = plugins_url('images/add-link.jpg',dirname(__FILE__));
 		$linkcat = admin_url('edit-tags.php?taxonomy=link_category');
@@ -83,7 +81,7 @@ area and select <i>Trademarks</i> as the link category.</p>
 <p><img src="<?php echo $screenshot3;?>" alt="Screenshot of adding a trademark link " /></p>
 <form id="misc_options" method="post" action="<?php echo $this_url; ?>">
 <p>
-<?php wp_nonce_field(self::CLASSNAME); ?>
+<?php wp_nonce_field(__CLASS__); ?>
 <?php wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false ); ?>
 <?php wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false ); ?>
 </p>
