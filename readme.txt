@@ -3,8 +3,8 @@ Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.0
-Tested up to: 3.8
-Stable tag: 1.7
+Tested up to: 3.8.1
+Stable tag: 1.7.1
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.7.1 = Fix bug when loaded under AJAX
 = 1.7 = Made email address a mailto link. Added pre-defined classes, tiny and small, to make it easy to use a smaller font size in the footer on pages such as landing pages. Added widget visibility setting to make it easy to either hide or show the footer widgets on landing pages. Replaced the plugin icon image in admin menu with a dashicons font character. Automatically uses HTML5 if theme supports HTML5 - no manual setting required.
 = 1.6 = Add option to include email address in the copyright footer widget, remove the automatic adding of rel=nofollow in footer links, and add optional sub-footer sections to the privacy and terms pages
 = 1.5 = Use Javascript for Return To Top link to make it work on HTML5 sites, and strengthen CSS to ensure footer copyright and trademark widgets are full width
@@ -58,8 +59,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.7 = 
-* Optional - Additional predefined footer classes and mailto link.
+= 1.7.1 = 
+* Mandatory - Fix bug when loaded under AJAX.
 
 == Links ==
 
