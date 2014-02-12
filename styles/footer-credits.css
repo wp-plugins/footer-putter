@@ -1,4 +1,4 @@
-#footer .footer-center, #footer .return-center, .footer-center, .return-center { text-align: center; margin: 10px 0px; }
+#footer .footer-center, #footer .return-center, .footer-center, .return-center { text-align: center; margin: 10px 0px; border:none;}
 #footer .return-left, .return-left { float: left; width : 20%; }
 #footer .footer-right, .footer-right { float: right; text-align: right; width: 70%; margin-bottom: 10px; }
 #footer #footer-credits ul, #footer #footer-credits ul li, #footer-credits ul, #footer-credits ul li  {
@@ -9,10 +9,10 @@
         content : ''; }
 #footer #footer-credits ul li a, #footer-credits ul li a {
         text-decoration: none; color: inherit; font-weight: normal; letter-spacing : normal; text-transform: none; margin:0 10px; }                
-#footer #footer-credits ul li a:hover, #footer-credits ul li a:hover {
+#footer #footer-credits ul li a:hover, #footer-credits ul li a:hover, #footer-credits a.email:hover, #footer-credits a.map:hover {
         text-decoration: underline;  }
 #footer-credits span.copyright, #footer-credits span.telephone, #footer-credits span.address, 
-#footer-credits span.email, #footer-credits span.email a {
+#footer-credits a.email, #footer-credits a.map {
         font-weight: normal; letter-spacing : normal; text-transform: none; margin: 0 10px; vertical-align: middle;
         background: inherit; border : none; float: none; display: inline;  color: inherit; text-decoration: none; }
         
@@ -23,7 +23,7 @@
 #footer-credits.tiny, #footer-credits.tiny ul li a, #footer-return.tiny a { font-size : x-small; }
 
 .widget_footer_trademarks { text-align: center; margin: 10px 0;}
-.widget_footer_trademarks a { margin: 10px; }
+.widget_footer_trademarks a { margin: 10px; border: 0 !important;}
 .widget_footer_trademarks img { border: 0 !important; }
 
 .widget_footer_copyright,  .widget_footer_trademarks 

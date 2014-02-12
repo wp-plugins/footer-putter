@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 1.7.1
+Stable tag: 1.8
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,9 +22,11 @@ Put a footer on your site that boosts your credibility with both search engines 
 * Supports both a single line centred footer and a multi-line right aligned footer
 * The Footer hook setting allows you to add the footer in just the right place on themes that do not have suitable widget areas 
 * Predefined classes tiny, small, light, dark and white make it easy to change footer size and color if required. 
-* Added widget visibility control: show always, don’t show on landing pages, only show on landing pages.
-* Automatic HTML5 support
 * Can append company contact information to Privacy and Terms and Conditions pages.
+* Added widget visibility control: show always, do not show on landing pages, only show on landing pages.
+* Automatic HTML5 support
+* Option to use HTML5 microdata for Organization in accordance with Google recommendations
+* Option to apply rel=nofollow automatically to footer trademark links
 
 == Installation ==
 
@@ -46,6 +48,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.8 = Added options to use HTML5 microdata and to apply rel=nofollow automatically to footer trademark links
 = 1.7.1 = Fix bug when loaded under AJAX
 = 1.7 = Made email address a mailto link. Added pre-defined classes, tiny and small, to make it easy to use a smaller font size in the footer on pages such as landing pages. Added widget visibility setting to make it easy to either hide or show the footer widgets on landing pages. Replaced the plugin icon image in admin menu with a dashicons font character. Automatically uses HTML5 if theme supports HTML5 - no manual setting required.
 = 1.6 = Add option to include email address in the copyright footer widget, remove the automatic adding of rel=nofollow in footer links, and add optional sub-footer sections to the privacy and terms pages
@@ -59,8 +62,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Upgrade Notice ==
 
-= 1.7.1 = 
-* Mandatory - Fix bug when loaded under AJAX.
+= 1.8 = 
+* Optional - Option to use HTML5 microdata for Organization in accordance with Google recommendations.
 
 == Links ==
 
@@ -68,3 +71,5 @@ Here are some of the useful Footer Putter WordPress Plugin links
 
 * Footer Putter Plugin: http://www.diywebmastery.com/plugins/footer-putter/
 * Compatible Themes and Hooks: http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks 
+* How To Use A Different Footer On Landing Pages: http://www.diywebmastery.com/4098/how-to-add-a-different-footer-on-landing-pages
+* Using HTML5 Microdata for better SEO and Local Search: http://www.diywebmastery.com/4109/using-html5-microdata-footer

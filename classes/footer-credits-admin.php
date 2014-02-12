@@ -9,11 +9,19 @@ class FooterCreditsAdmin {
     private static $screen_id;
     private static $keys;
 	private static $tips = array(
-			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'), 
-			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'), 
-			'country' => array('heading' => 'Country', 'tip' => 'Enter the country where the legal entity is domiciled.'), 
-			'telephone' => array('heading' => 'Telephone Number', 'tip' => 'Enter a telephone number here if you want it to appear in the footer of the installed site.'), 
-			'email' => array('heading' => 'Email Address', 'tip' => 'Enter the email address here if you want it to appear in the footer and in the privacy statement.'), 
+			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'),
+            'microdata' => array('heading' => 'Use Microdata', 'tip' => 'Markup the organization details with HTML5 microdata.'),
+			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'),
+	        'street_address' => array('heading' => 'Street Address', 'tip' => 'Enter the firat line of the address that you want to appear in the footer and the privacy and terms pages.'),
+			'locality' => array('heading' => 'Locality (City)', 'tip' => 'Enter the town or city.'),
+			'region' => array('heading' => 'State (Region)', 'tip' => 'Enter the state, province, region or county.'),
+			'postal_code' => array('heading' => 'Postal Code', 'tip' => 'Enter the postal code.'),
+			'country' => array('heading' => 'Country', 'tip' => 'Enter the country where the legal entity is domiciled.'),
+			'latitude' => array('heading' => 'Latitude', 'tip' => 'Enter the latitude of the organization&#39;s location - maybe be used by Google or local search.'),
+			'longitude' => array('heading' => 'Longitude', 'tip' => 'Enter the longitude of the organization&#39;s location - maybe be used by Google or local search.'),
+			'map' => array('heading' => 'Map URL', 'tip' => 'Enter the URL of a map that shows the organization&#39;s location.'),
+			'telephone' => array('heading' => 'Telephone Number', 'tip' => 'Enter a telephone number here if you want it to appear in the footer of the installed site.'),
+			'email' => array('heading' => 'Email Address', 'tip' => 'Enter the email address here if you want it to appear in the footer and in the privacy statement.'),
 			'courts' => array('heading' => 'Legal Jurisdiction' , 'tip' => 'The Courts that have jurisdiction over any legal disputes regarding this site. For example: <i>the state and federal courts in Santa Clara County, California</i>, or <i>the Law Courts of England and Wales</i>'),
 			'updated' => array('heading' => 'Last Updated' , 'tip' => 'This will be defaulted as today. For example, Oct 23rd, 2012'),
 			'copyright_start_year' => array('heading' => 'Copyright Start' , 'tip' => 'The start year of the business appears in the copyright statement in the footer and an on the Terms and Conditions page.'),
@@ -158,41 +166,61 @@ INTRO_PANEL;
 	
 	public static function owner_panel($post,$metabox){	
 		$terms = $metabox['args']['options']['terms'];	 	
-		$tip1 = self::$tooltips->tip('owner');	
-		$tip2 = self::$tooltips->tip('address');
-		$tip3 = self::$tooltips->tip('country');					
-		$tip4 = self::$tooltips->tip('privacy_contact');
-		$privacy_contact = $terms['privacy_contact'] ? 'checked="checked"' : '';	
-		print <<< OWNER_PANEL
-<label>{$tip1}</label><input type="text" name="owner" size="25" value="{$terms['owner']}" /><br/>
-<label>{$tip2}</label><input type="text" name="address" size="80" value="{$terms['address']}" /><br/>
-<label>{$tip3}</label><input type="text" name="country" size="25" value="{$terms['country']}" /><br/>
-<label>{$tip4}</label><input type="checkbox" name="privacy_contact" {$privacy_contact} value="1" /><br/>
+		$tip1 = self::$tooltips->tip('owner');
+		$tip2 = self::$tooltips->tip('country');
+		$tip3 = self::$tooltips->tip('address');
+		$tip4 = self::$tooltips->tip('street_address');
+		$tip5 = self::$tooltips->tip('locality');
+		$tip6 = self::$tooltips->tip('region');
+		$tip7 = self::$tooltips->tip('postal_code');
+		$tip8 = self::$tooltips->tip('latitude');
+		$tip9 = self::$tooltips->tip('longitude');
+		$tip10 = self::$tooltips->tip('map');
+	print <<< OWNER_PANEL
+<label>{$tip1}</label><input type="text" name="owner" size="30" value="{$terms['owner']}" /><br/>
+<label>{$tip2}</label><input type="text" name="country" size="30" value="{$terms['country']}" /><br/>
+<label>{$tip3}</label><input type="text" name="address" size="80" value="{$terms['address']}" /><br/>
 OWNER_PANEL;
-	}	
-    
-	public static function contact_panel($post,$metabox){	
-		$terms = $metabox['args']['options']['terms'];	 	
+        if (FooterCredits::is_html5()) print <<< ADDRESS_DATA
+<p>Leave the above address field blank and fill in the various parts of the organization address below if you want to use HTML5 microdata.</p>
+<h4>Organization Address</h4>
+<label>{$tip4}</label><input type="text" name="street_address" size="30" value="{$terms['street_address']}" /><br/>
+<label>{$tip5}</label><input type="text" name="locality" size="30" value="{$terms['locality']}" /><br/>
+<label>{$tip6}</label><input type="text" name="region" size="30" value="{$terms['region']}" /><br/>
+<label>{$tip7}</label><input type="text" name="postal_code" size="12" value="{$terms['postal_code']}" /><br/>
+<h4>Geogrpahical Co-ordinates</h4>
+<p>The geographical co-ordinates are optional and are visible only to the search engines.</p>
+<label>{$tip8}</label><input type="text" name="latitude" size="12" value="{$terms['latitude']}" /><br/>
+<label>{$tip9}</label><input type="text" name="longitude" size="12" value="{$terms['longitude']}" /><br/>
+<label>{$tip10}</label><input type="text" name="map" size="30" value="{$terms['map']}" /><br/>
+ADDRESS_DATA;
+	}
+
+	public static function contact_panel($post,$metabox){
+		$terms = $metabox['args']['options']['terms'];
+		$tip1 = self::$tooltips->tip('email');
 		$tip2 = self::$tooltips->tip('telephone');
-		$tip1 = self::$tooltips->tip('email');		
+		$tip3 = self::$tooltips->tip('privacy_contact');
+		$tip4 = self::$tooltips->tip('terms_contact');
+		$privacy_contact = $terms['privacy_contact'] ? 'checked="checked"' : '';
+		$terms_contact = $terms['terms_contact'] ? 'checked="checked"' : '';
 		print <<< CONTACT_PANEL
 <label>{$tip1}</label><input type="text" name="email" size="30" value="{$terms['email']}" /><br/>
-<label>{$tip2}</label><input type="text" name="telephone" size="20" value="{$terms['telephone']}" /><br/>
+<label>{$tip2}</label><input type="text" name="telephone" size="30" value="{$terms['telephone']}" /><br/>
+<label>{$tip3}</label><input type="checkbox" name="privacy_contact" {$privacy_contact} value="1" /><br/>
+<label>{$tip4}</label><input type="checkbox" name="terms_contact" {$terms_contact} value="1" /><br/>
 CONTACT_PANEL;
 	}
-	
- 	public static function legal_panel($post,$metabox){		
-		$terms = $metabox['args']['options']['terms'];	 	
+
+ 	public static function legal_panel($post,$metabox){
+		$terms = $metabox['args']['options']['terms'];
 		$tip1 = self::$tooltips->tip('courts');
 		$tip2 = self::$tooltips->tip('updated');
-		$tip3 = self::$tooltips->tip('copyright_start_year');			
-		$tip4 = self::$tooltips->tip('terms_contact');
-		$terms_contact = $terms['terms_contact'] ? 'checked="checked"' : '';	
+		$tip3 = self::$tooltips->tip('copyright_start_year');
 		print <<< LEGAL_PANEL
 <label>{$tip1}</label><input type="text" name="courts" size="80" value="{$terms['courts']}" /><br/>
-<label>{$tip2}</label><input type="text" name="updated" size="20" value="{$terms['updated']}" /><br/>
+<label>{$tip2}</label><input type="text" name="updated" size="30" value="{$terms['updated']}" /><br/>
 <label>{$tip3}</label><input type="text" name="copyright_start_year" size="5" value="{$terms['copyright_start_year']}" /><br/>
-<label>{$tip4}</label><input type="checkbox" name="terms_contact" {$terms_contact} value="1" /><br/>
 LEGAL_PANEL;
 	}
 
