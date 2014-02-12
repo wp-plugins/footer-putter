@@ -1,9 +1,9 @@
 <?php
 class FooterCredits {
     const CODE = 'footer-credits'; //element prefix
-	const OPTIONS_NAME = 'footer_credits_options'; 
+	const OPTIONS_NAME = 'footer_credits_options';
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.7';
+	const VERSION = '1.8';
     private static $version;
 
 	protected static $is_html5 = false;
@@ -13,14 +13,21 @@ class FooterCredits {
 		'terms' => array(
 			'site' => '',
 			'owner' => '',
-			'copyright' => '',
-			'copyright_start_year' => '',
+			'address' => '',
+            'street_address' => '',
+            'locality' => '',
+            'region' => '',
+            'postal_code' => '',
 			'country' => '',
-			'courts' => '',
+            'latitude' => '',
+            'longitude' => '',
+            'map' => '',
 			'email' => '',
 			'telephone' => '',
-			'address' => '',
-			'updated' => '',
+			'copyright' => '',
+			'copyright_start_year' => '',
+			'courts' => '',
+            'updated' => '',
 			'privacy_contact' => '',
 			'terms_contact' => ''),
 		'nav_menu' => 0,
@@ -34,24 +41,29 @@ class FooterCredits {
 		'show_return' => true,
 		'return_text' => 'Return To Top',
 		'return_class' => '',
-		'footer_class' => '',			
+		'footer_class' => '',
 		'footer_hook' => '',
 		'footer_remove' => true,
  		'footer_filter_hook' => '',
- 		'visibility' => ''
+ 		'visibility' => '' ,
+        'use_microdata' => false
 	);
-	
+
     private static function get_version(){
 		return self::$version;
 	}
-	
+
+    public static function is_html5(){
+		return self::$is_html5;
+	}
+
 	public static function init() {
 		self::$version = self::VERSION;
-		self::$is_html5 = function_exists('current_theme_supports') && current_theme_supports('html5'); 
+		self::$is_html5 = function_exists('current_theme_supports') && current_theme_supports('html5');
 		self::theme_specific_defaults();
-		add_action('widgets_init',array(__CLASS__,'register'),20);		
+		add_action('widgets_init',array(__CLASS__,'register'),20);
 		add_filter( 'wp_nav_menu_items', array(__CLASS__, 'fix_home_link'), 10, 2 );
-		if (!is_admin()) add_action('wp',array(__CLASS__,'prepare'));	
+		if (!is_admin()) add_action('wp',array(__CLASS__,'prepare'));
 	}
 
 	public static function register() {
@@ -91,7 +103,7 @@ class FooterCredits {
 	
     private static function register_sidebars() {
     	if (self::get_option('footer_hook')) {
-			$tag = self::$is_html5 ? 'section' : 'div';
+			$tag = self::is_html5() ? 'section' : 'div';
 			register_sidebar( array(
 				'id' => self::SIDEBAR_ID,
 				'name'	=> __( 'Credibility Footer', __CLASS__ ),
@@ -227,37 +239,112 @@ class FooterCredits {
 		return sprintf( '<div id="footer-return" class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
 	}
 
+    private static function contact_info($params, $item_separator, $section_separator) {
+        $org ='';
+        if ($address = self::contact_address($params['show_address'], $params['use_microdata'], $params['separator'], $section_separator)) $org .= $address;
+        if ($telephone = self::contact_telephone($params['show_telephone'], $params['use_microdata'],  $item_separator)) $org .= $telephone;
+        if ($email = self::contact_email($params['show_email'], $params['use_microdata'], $item_separator)) $org .= $email;
+        if  ($org && $params['use_microdata'])
+            return sprintf('<span itemscope="itemscope" itemtype="http://schema.org/Organization">%1$s</span>', $org);
+        else
+            return $org;
+    }
+
+    private static function contact_telephone($show_telephone, $microdata, $prefix) {
+      if  ($show_telephone && ($telephone = self::get_term('telephone')))
+        if ($microdata)
+            return sprintf('%1$s<span itemprop="telephone" class="telephone">%2$s</span>', $prefix, $telephone) ;
+        else
+            return sprintf('%1$s<span class="telephone">%2$s</span>', $prefix, $telephone) ;
+      else
+            return '';
+    }
+
+    private static function contact_email($show_email, $microdata, $prefix) {
+      if  ($show_email && ($email = self::get_term('email')))
+            return sprintf('%1$s<a href="mailto:%2$s" class="email"%3$s>%2$s</a>', $prefix, $email, $microdata ? ' itemprop="email"' : '') ;
+      else
+            return '';
+    }
+
+    private static function contact_address($show_address, $microdata, $separator, $prefix) {
+      if  ($show_address)
+        if ($microdata) {
+            return self::org_location($separator, $prefix);
+        } elseif ($address = self::get_term('address'))
+            return sprintf('%1$s<span class="address">%2$s%3$s</span>', $prefix, self::format_address($address, $separator), self::get_term('country'));
+      return '';
+    }
+
+    private static function org_location($separator, $prefix) {
+        $location = '';
+        if ($loc_address = self::location_address( $separator)) $location .=  $loc_address;
+        if ($loc_geo = self::location_geo()) $location .= $loc_geo;
+        if ($loc_map = self::location_map()) $location .= $loc_map;
+        if ($location)
+            return sprintf('%1$s<span itemprop="location" itemscope="itemscope" itemtype="http://schema.org/Place">%2$s</span>', $prefix, $location) ;
+        else
+            return '';
+    }
+
+    private static function location_address($separator) {
+        $address = '';
+        if ( $street_address = self::get_term('street_address'))
+            $address .=  sprintf('<span itemprop="streetAddress">%1$s</span>', self::format_address($street_address, $separator)) ;
+        if ( $locality = self::get_term('locality'))
+                $address .=  sprintf('<span itemprop="addressLocality">%1$s</span>', self::format_address($locality, $separator)) ;
+        if ( $region = self::get_term('region'))
+                $address .=  sprintf('<span itemprop="addressRegion">%1$s</span>', self::format_address($region, $separator)) ;
+        if ( $postal_code = self::get_term('postal_code'))
+                $address .=  sprintf('<span itemprop="postalCode">%1$s</span>', self::format_address($postal_code, $separator)) ;
+        if ( $country = self::get_term('country'))
+                $address .=  sprintf('<span itemprop="addressCountry">%1$s</span>', $country) ;
+
+        if ($address)
+            return sprintf('<span class="address" itemprop="address" itemscope="itemscope" itemtype="http://schema.org/PostalAddress">%1$s</span>',$address) ;
+        else
+            return '';
+    }
+
+    private static function location_geo() {
+        $geo = '';
+        if ( $latitude = self::get_term('latitude')) $geo .=  sprintf('<meta itemprop="latitude" content="%1$s" />', $latitude) ;
+        if ( $longitude = self::get_term('longitude')) $geo .=  sprintf('<meta itemprop="longitude" content="%1$s" />', $longitude) ;
+        return $geo ? sprintf('<span itemprop="geo" itemscope="itemscope" itemtype="http://schema.org/GeoCoordinates">%1$s</span>', $geo) : '';
+    }
+
+    private static function location_map() {
+        if ( $map = self::get_term('map'))
+            return sprintf('<a rel="nofollow external" target="_blank" class="map" itemprop="map" href="%1$s">%2$s</a>', $map, __('Map')) ;
+        else
+            return '';
+    }
+
 	public static function footer($atts = array()) {
-  		$params = shortcode_atts( self::get_options(), $atts ); //apply plugin defaults   
-		
+  		$params = shortcode_atts( self::get_options(), $atts ); //apply plugin defaults
+
 		if ($params['center']) {
-			$section_separator = '&nbsp;';
-			$item_separator = $params['two_lines'] ? '<br/>' : $params['separator'];
+			$item_separator = '&nbsp;';
+			$section_separator = $params['two_lines'] ? '<br/>' : $params['separator'];
 			$params['return_class'] .= ' return-center';
 			$params['footer_class'] .= ' footer-center';
 			$clear = '';
 		} else {
-			$section_separator = $params['two_lines'] ? $params['separator'] : '<br/>' ;
-			$item_separator = '<br/>';
+			$item_separator = $params['two_lines'] ? $params['separator'] : '<br/>' ;
+			$section_separator = '<br/>';
 			$params['return_class'] .= ' return-left';
 			$params['footer_class'] .= ' footer-right';
 			$clear = '<div class="clear"></div>';
 		}	
-		$copyright = self::copyright_owner(self::get_terms());
-		$telephone = self::get_term('telephone');			
-		$email = self::get_term('email');	
-		$address = self::get_term('address');
 		return (empty($params['show_return']) ? '' :
 			self::return_to_top($params['return_text'], $params['return_class'])) . 
-			sprintf('<div id="%1$s" class="%2$s">%3$s%4$s%5$s%6$s%7$s</div>%8$s<!-- end #%1$s -->', 
+			sprintf('<div id="%1$s" class="%2$s">%3$s%4$s%5$s</div>%6$s<!-- end #%1$s -->',
 				self::CODE,
 				$params['footer_class'], 	
-				(empty($params['nav_menu']) ? '' : self::footer_menu($params['nav_menu'])), 
-				(empty($params['show_copyright']) ? '' : sprintf('%1$s%2$s', $section_separator, $copyright)),
-				((empty($address) || empty($params['show_address'])) ? '' : sprintf('%1$s<span class="address">%2$s%3$s</span>', $item_separator, self::format_address($address, $params['separator']), self::get_term('country')) ),
-				((empty($telephone) || empty($params['show_telephone'])) ? '' : sprintf('%1$s<span class="telephone">%2$s</span>', $section_separator, $telephone) ),
-				((empty($email) || empty($params['show_email'])) ? '' : sprintf('%1$s<span class="email"><a href="mailto:%2$s">%2$s</a></span>', $section_separator, $email) ),
-				$clear				
+				(empty($params['nav_menu']) ? '' : self::footer_menu($params['nav_menu'])),
+				(empty($params['show_copyright']) ? '' : sprintf('%1$s%2$s', $item_separator, self::copyright_owner(self::get_terms()))),
+				self::contact_info($params, $item_separator, $section_separator),
+				$clear
 			);				
 	}
 
@@ -270,14 +357,14 @@ class FooterCredits {
 				$to[] = $value;
 			}
 			return str_replace($from,$to,$content);
-		} 
+		}
 		return $content;
 	}
 
 	public static function custom_footer() {
 		if ( is_active_sidebar( self::SIDEBAR_ID) ) {
-			if (self::$is_html5) {
-				echo '<footer class="custom-footer" role="contentinfo" itemscope="" itemtype="http://schema.org/WPFooter">';
+			if (self::is_html5()) {
+				echo '<footer class="custom-footer" role="contentinfo" itemscope="itemscope" itemtype="http://schema.org/WPFooter">';
 				dynamic_sidebar( self::SIDEBAR_ID );
 				echo '</footer><!-- end .custom-footer -->';
 			} else {
@@ -461,8 +548,9 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		$instance['show_telephone'] = !empty($new_instance['show_telephone']) ? 1 : 0;	
 		$instance['show_email'] = !empty($new_instance['show_email']) ? 1 : 0;	
 		$instance['show_address'] = !empty($new_instance['show_address']) ? 1 : 0;	
+		$instance['use_microdata'] = !empty($new_instance['use_microdata']);
 		$instance['center'] = !empty($new_instance['center']) ? 1 : 0;
-		$instance['two_lines'] = !empty($new_instance['two_lines']) ? 1 : 0;	
+		$instance['two_lines'] = !empty($new_instance['two_lines']) ? 1 : 0;
 		$instance['show_return'] = !empty($new_instance['show_return']) ? 1 : 0;
 		$instance['return_class'] = trim($new_instance['return_class']);
 		$instance['footer_class'] = trim($new_instance['footer_class']);
@@ -489,6 +577,7 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		$this->print_form_field($instance, 'show_telephone', 'Show Telephone number', 'checkbox');
 		$this->print_form_field($instance, 'show_email', 'Show Email Address', 'checkbox');
 		$this->print_form_field($instance, 'show_return', 'Show Return To Top Links', 'checkbox');
+		if (FooterCredits::is_html5()) $this->print_form_field($instance, 'use_microdata', 'Use HTML5 Microdata', 'checkbox');
 
 		print <<< CUSTOM_CLASSES
 <h4>Custom Classes (Optional)</h4>
