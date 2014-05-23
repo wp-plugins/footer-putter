@@ -1,10 +1,10 @@
 <?php
-class FooterCreditsAdmin {
+
+if (!class_exists('Footer_Credits_Admin')) {
+class Footer_Credits_Admin {
     const CODE = 'footer-credits'; //prefix ID of CSS elements
-    const FOOTER = 'FooterCredits'; //class that builds footer
-	const SLUG = 'footer';
-    private static $version;
-    private static $parenthook;
+    const FOOTER = 'Footer_Credits'; //class that builds footer
+	const SLUG = 'credits';
     private static $slug;
     private static $screen_id;
     private static $keys;
@@ -31,24 +31,14 @@ class FooterCreditsAdmin {
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
 			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
 			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.'),
-			'privacy_contact' => array('heading' => 'Add Privacy Contact?', 'tip' => 'Add a section to the end of the privacy statement with contact information'),
-			'terms_contact' => array('heading' => 'Add Terms Contact?', 'tip' => 'Add a section to the end of the Terms and Conditions page with contact and legal information'),
+			'privacy_contact' => array('heading' => 'Add Privacy Contact?', 'tip' => 'Add a section to the end of the Privacy page with contact information'),
+			'terms_contact' => array('heading' => 'Add Terms Contact?', 'tip' => 'Add a section to the end of the Terms page with contact and legal information'),
 	);
 	private static $tooltips;
 
-	public static function init($parent) {
-		self::$version = FooterCredits::VERSION;
-		self::$parenthook = $parent;
-	    self::$slug = self::$parenthook . '-' . self::SLUG;  
+	public static function init() {
+		self::$slug = Footer_Credits_Plugin::get_slug() . '-' . self::SLUG;  
 		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
-	}
-	
-    private static function get_parenthook(){
-		return self::$parenthook;
-	}
-
-    private static function get_version(){
-		return self::$version;
 	}
 
     public static function get_slug(){
@@ -75,7 +65,7 @@ class FooterCreditsAdmin {
 	}	
 
 	public static function admin_menu() {
-		self::$screen_id =  add_submenu_page(self::get_parenthook(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
+		self::$screen_id = add_submenu_page(Footer_Credits_Plugin::get_slug(), __('Footer Credits'), __('Footer Credits'), 'manage_options', 
 			self::get_slug(), array(__CLASS__,'settings_panel'));
 		add_action('load-'.self::get_screen_id(), array(__CLASS__, 'load_page'));
 	}
@@ -83,25 +73,25 @@ class FooterCreditsAdmin {
 
 	public static function load_page() {
  		$message =  isset($_POST['options_update']) ? self::save() : '';	
-		$options = call_user_func(array(self::FOOTER, 'get_options'));
+		$options = Footer_Credits::get_options();
 		$callback_params = array ('options' => $options, 'message' => $message);
 		add_meta_box(self::CODE.'-intro', __('Introduction'), array(__CLASS__, 'intro_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-owner', __('Site Owner Details'), array(__CLASS__, 'owner_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-contact', __('Contact Details'), array(__CLASS__, 'contact_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-legal', __('Legal Details'), array(__CLASS__, 'legal_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-return', __('Return To Top'), array(__CLASS__, 'return_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
-		add_meta_box(self::CODE.'-example', __('Preview Footer'), array(__CLASS__, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
+		add_meta_box(self::CODE.'-example', __('Preview Footer Content'), array(__CLASS__, 'preview_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_meta_box(self::CODE.'-advanced', __('Advanced'), array(__CLASS__, 'advanced_panel'), self::get_screen_id(), 'normal', 'core', $callback_params);
 		add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_styles'));
  		add_action('admin_enqueue_scripts',array(__CLASS__, 'enqueue_scripts'));	
 	    self::$keys = array_keys(self::$tips);	
-		self::$tooltips = new DIYTooltip(self::$tips);
+		self::$tooltips = new DIY_Tooltip(self::$tips);
 	}
 
 	public static function enqueue_styles() {
-		wp_enqueue_style(self::CODE, plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),self::get_version());
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css',dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
-		wp_enqueue_style(self::CODE.'-tooltip', plugins_url('styles/tooltip.css',dirname(__FILE__)), array(),FOOTER_PUTTER_VERSION);
+		wp_enqueue_style(self::CODE, plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),Footer_Credits_Plugin::get_version());
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css',dirname(__FILE__)), array(),Footer_Credits_Plugin::get_version());
+		wp_enqueue_style(self::CODE.'-tooltip', plugins_url('styles/tooltip.css',dirname(__FILE__)), array(),Footer_Credits_Plugin::get_version());
  	}		
 
 	public static function enqueue_scripts() {
@@ -115,10 +105,10 @@ class FooterCreditsAdmin {
 		check_admin_referer(__CLASS__);
   		$page_options = explode(',', stripslashes($_POST['page_options']));
   		if ($page_options) {
-  			$options = call_user_func(array(self::FOOTER, 'get_options'));
+  			$options = Footer_Credits::get_options();
     		foreach ($page_options as $option) {
        			$val = array_key_exists($option, $_POST) ? trim(stripslashes($_POST[$option])) : '';
-				if (call_user_func(array(self::FOOTER, 'is_terms_key'),$option))
+				if (Footer_Credits::is_terms_key($option))
 					$options['terms'][$option] = $val;
  				else switch($option) {
 					case 'footer_remove' : $options[$option] = !empty($val); break;
@@ -128,7 +118,7 @@ class FooterCreditsAdmin {
 					}
     		} //end for	
     		$class='updated fade';
-   			$saved =  call_user_func(array(self::FOOTER, 'save'), $options) ;
+   			$saved =  Footer_Credits::save($options) ;
    			if ($saved)  {
        			$message = 'Footer Settings saved.';
    			} else
@@ -137,7 +127,7 @@ class FooterCreditsAdmin {
   		    $class='error';
        		$message= 'Footer Settings not found!';
   		}
-  		return sprintf('<div id="message" class="%1$s "><p>%2$s</p></div>',$class, __($message,self::FOOTER));
+  		return sprintf('<div id="message" class="%1$s "><p>%2$s</p></div>',$class, __($message));
 	}
 
     public static function toggle_postboxes() {
@@ -181,14 +171,14 @@ INTRO_PANEL;
 <label>{$tip2}</label><input type="text" name="country" size="30" value="{$terms['country']}" /><br/>
 <label>{$tip3}</label><input type="text" name="address" size="80" value="{$terms['address']}" /><br/>
 OWNER_PANEL;
-        if (FooterCredits::is_html5()) print <<< ADDRESS_DATA
+        if (Footer_Credits::is_html5()) print <<< ADDRESS_DATA
 <p>Leave the above address field blank and fill in the various parts of the organization address below if you want to use HTML5 microdata.</p>
 <h4>Organization Address</h4>
 <label>{$tip4}</label><input type="text" name="street_address" size="30" value="{$terms['street_address']}" /><br/>
 <label>{$tip5}</label><input type="text" name="locality" size="30" value="{$terms['locality']}" /><br/>
 <label>{$tip6}</label><input type="text" name="region" size="30" value="{$terms['region']}" /><br/>
 <label>{$tip7}</label><input type="text" name="postal_code" size="12" value="{$terms['postal_code']}" /><br/>
-<h4>Geogrpahical Co-ordinates</h4>
+<h4>Geographical Co-ordinates</h4>
 <p>The geographical co-ordinates are optional and are visible only to the search engines.</p>
 <label>{$tip8}</label><input type="text" name="latitude" size="12" value="{$terms['latitude']}" /><br/>
 <label>{$tip9}</label><input type="text" name="longitude" size="12" value="{$terms['longitude']}" /><br/>
@@ -234,7 +224,7 @@ RETURN_PANEL;
 
  	public static function preview_panel($post,$metabox){		
 		$options = $metabox['args']['options'];	 	
-		echo call_user_func(array(self::FOOTER, 'footer'),array('nav_menu' => 'Footer Menu'));
+		echo Footer_Credits::footer(array('nav_menu' => 'Footer Menu'));
 	}
 
  	public static function advanced_panel($post,$metabox){		
@@ -261,11 +251,11 @@ ADVANCED_PANEL;
 	public static function settings_panel() {
  		$this_url = $_SERVER['REQUEST_URI'];
 		$keys = implode(',',self::get_keys());
-		$title = sprintf('<h2>%1$s</h2>', __('Footer Credits Settings'));
+		$title = sprintf('<h2 class="title">%1$s</h2>', __('Footer Credits Settings'));
 		
 ?>
 <div class="wrap">
-    <?php screen_icon(); echo $title; ?>
+    <?php echo $title; ?>
     <div id="poststuff" class="metabox-holder">
         <div id="post-body" class="with-tooltips">
             <div id="post-body-content">
@@ -286,5 +276,5 @@ ADVANCED_PANEL;
 </div>
 <?php
 	}    
+ }
 }
-?>
