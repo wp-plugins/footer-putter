@@ -1,13 +1,14 @@
 <?php
-class FooterCredits {
+if (!class_exists('Footer_Credits')) {
+  class Footer_Credits {
     const CODE = 'footer-credits'; //element prefix
 	const OPTIONS_NAME = 'footer_credits_options';
 	const SIDEBAR_ID = 'last-footer';
-	const VERSION = '1.8';
-    private static $version;
-
+	
 	protected static $is_html5 = false;
 	protected static $is_landing = false;
+	protected static $landing_page_templates = array('page_landing.php');
+
 	protected static $options = array();
 	protected static $defaults = array(
 		'terms' => array(
@@ -49,16 +50,11 @@ class FooterCredits {
         'use_microdata' => false
 	);
 
-    private static function get_version(){
-		return self::$version;
-	}
-
     public static function is_html5(){
 		return self::$is_html5;
 	}
 
 	public static function init() {
-		self::$version = self::VERSION;
 		self::$is_html5 = function_exists('current_theme_supports') && current_theme_supports('html5');
 		self::theme_specific_defaults();
 		add_action('widgets_init',array(__CLASS__,'register'),20);
@@ -71,6 +67,24 @@ class FooterCredits {
 		self::register_widgets();
 	}
 
+    private static function register_sidebars() {
+    	if (self::get_option('footer_hook')) {
+			$tag = self::is_html5() ? 'section' : 'div';
+			register_sidebar( array(
+				'id' => self::SIDEBAR_ID,
+				'name'	=> __( 'Credibility Footer', __CLASS__ ),
+				'description' => __( 'Custom footer section for copyright, trademarks, etc', __CLASS__),
+				'before_widget' => '<'.$tag.' id="%1$s" class="widget %2$s"><div class="widget-wrap">',
+				'after_widget'  => '</div></'.$tag.'>'				
+			) );
+		}
+    }
+	
+	private static function register_widgets() {
+		register_widget( 'Footer_Credits_Copyright_Widget' );
+		register_widget( 'Footer_Credits_Trademark_Widget' );
+	}	
+	
 	public static function prepare() {
 		add_shortcode(self::CODE.'-copyright', array(__CLASS__, 'copyright_owner' ) );
 		add_shortcode(self::CODE.'-menu', array(__CLASS__, 'footer_menu' ) );
@@ -78,8 +92,8 @@ class FooterCredits {
 		add_filter('widget_text', 'do_shortcode', 11);
 		add_action('wp_enqueue_scripts',array(__CLASS__, 'enqueue_styles' ));
 
-		self::$is_landing = is_page_template('page_landing.php');
-			
+		self::$is_landing = self::is_landing_page(); //is this a landing page
+					
 		//insert custom footer at specified hook
 		if ($footer_hook = self::get_option('footer_hook'))  {
 			if (self::get_option('footer_remove')) remove_all_actions( $footer_hook); 
@@ -100,27 +114,9 @@ class FooterCredits {
 			add_filter('the_content', array(__CLASS__, 'terms_filter') );	
 				
 	}
-	
-    private static function register_sidebars() {
-    	if (self::get_option('footer_hook')) {
-			$tag = self::is_html5() ? 'section' : 'div';
-			register_sidebar( array(
-				'id' => self::SIDEBAR_ID,
-				'name'	=> __( 'Credibility Footer', __CLASS__ ),
-				'description' => __( 'Custom footer section for copyright, trademarks, etc', __CLASS__),
-				'before_widget' => '<'.$tag.' id="%1$s" class="widget %2$s"><div class="widget-wrap">',
-				'after_widget'  => '</div></'.$tag.'>'				
-			) );
-		}
-    }
-	
-	private static function register_widgets() {
-		register_widget( 'Footer_Putter_Copyright_Widget' );
-		register_widget( 'Footer_Putter_TradeMark_Widget' );
-	}	
-	
+
 	public static function enqueue_styles() {
-		wp_enqueue_style(__CLASS__, plugins_url('styles/footer-credits.css',dirname(__FILE__)), array(), self::get_version());
+		wp_enqueue_style(__CLASS__, plugins_url('styles/footer-credits.css',dirname(__FILE__)), array(), Footer_Credits_Plugin::get_version());
     }
 
 	public static function fix_home_link( $content, $args) {
@@ -516,86 +512,17 @@ TERMS;
 					selected($optkey, $value, false), $optkey, $optlabel); 
 		return sprintf('<select id="%1$s" name="%2$s">%3$s</select>', $fld_id, $fld_name, $input);							
 	}
-
-}
-
-class Footer_Putter_Copyright_Widget extends WP_Widget {
-
-	const DOMAIN = 'FooterCredits';
-
-    private	$defaults = array( 
-    	'nav_menu' => 0, 'center' => true, 'two_lines' => true,  
-		'show_copyright' => true, 'show_address' => true, 'show_telephone' => true, 'show_email' => false,
-		'show_return' => true, 'return_class' => '', 'footer_class' => '', 'visibility' => '');
-
-	function __construct() {
-		$widget_ops = array( 'description' => __( "A widget displaying menu links, copyright and company details" ) );
-		parent::__construct('footer_copyright', __('Footer Copyright Widget'), $widget_ops);
-	}
 	
-	function widget( $args, $instance ) {
-		extract( $args );		
-		if (FooterCredits::hide_widget($instance)) return; //check visibility requirements
-
-		if ($footer = FooterCredits::footer($instance)) 
-			printf ('%1$s%2$s%3$s', $before_widget, $footer, $after_widget);
-	}
-
-	function update( $new_instance, $old_instance ) {
-		$instance = $old_instance;
-		$instance['nav_menu'] = !empty($new_instance['nav_menu']) ? $new_instance['nav_menu'] : 0;
-		$instance['show_copyright'] = !empty($new_instance['show_copyright']) ? 1 : 0;
-		$instance['show_telephone'] = !empty($new_instance['show_telephone']) ? 1 : 0;	
-		$instance['show_email'] = !empty($new_instance['show_email']) ? 1 : 0;	
-		$instance['show_address'] = !empty($new_instance['show_address']) ? 1 : 0;	
-		$instance['use_microdata'] = !empty($new_instance['use_microdata']);
-		$instance['center'] = !empty($new_instance['center']) ? 1 : 0;
-		$instance['two_lines'] = !empty($new_instance['two_lines']) ? 1 : 0;
-		$instance['show_return'] = !empty($new_instance['show_return']) ? 1 : 0;
-		$instance['return_class'] = trim($new_instance['return_class']);
-		$instance['footer_class'] = trim($new_instance['footer_class']);
-		$instance['visibility'] = trim($new_instance['visibility']);
-		return $instance;
-	}
-
-	function form( $instance ) {
-		$menu_terms = get_terms( 'nav_menu', array( 'hide_empty' => false ) );
-		if ( !$menu_terms ) {
-			echo '<p>'. sprintf( __('No menus have been created yet. <a href="%s">Create some</a>.', GENESIS_CLUB_DOMAIN ), admin_url('nav-menus.php') ) .'</p>';
-			return;
-		}
-		$menus = array();
-		$menus[0] = 'Do not show a menu';
-		foreach ( $menu_terms as $term ) $menus[ $term->term_id ] = $term->name;
-		
-		$instance = wp_parse_args( (array) $instance, $this->defaults);
-		$this->print_form_field($instance, 'nav_menu', 'Select Footer Menu', 'select', $menus);
-		$this->print_form_field($instance, 'center', 'Center Menu', 'checkbox');
-		$this->print_form_field($instance, 'two_lines', 'Spread Over Two Lines', 'checkbox');
-		$this->print_form_field($instance, 'show_copyright', 'Show Copyright', 'checkbox');
-		$this->print_form_field($instance, 'show_address', 'Show Address', 'checkbox');
-		$this->print_form_field($instance, 'show_telephone', 'Show Telephone number', 'checkbox');
-		$this->print_form_field($instance, 'show_email', 'Show Email Address', 'checkbox');
-		$this->print_form_field($instance, 'show_return', 'Show Return To Top Links', 'checkbox');
-		if (FooterCredits::is_html5()) $this->print_form_field($instance, 'use_microdata', 'Use HTML5 Microdata', 'checkbox');
-
-		print <<< CUSTOM_CLASSES
-<h4>Custom Classes (Optional)</h4>
-<p>Add any custom CSS classes you want apply to the footer section content to change the font color and size.</p>
-<p>For your convenience we have defined 3 color classes <i>dark</i>, <i>light</i> and <i>white</i>, and 2 size classes, 
-<i>small</i> and <i>tiny</i>. Feel free to use these alongside your own custom CSS classes.</p>
-CUSTOM_CLASSES;
-
-		$this->print_form_field($instance, 'return_class', 'Return To Top', 'text', array(), array('size' => 10));
-		$this->print_form_field($instance, 'footer_class', 'Footer Credits', 'text', array(), array('size' => 10));
-		$this->print_form_field($instance, 'visibility', '<h4>Widget Visibility</h4>', 'radio',
-			FooterCredits::get_visibility_options(), array('separator' => '<br/>'));
-	}
-
-	function print_form_field($instance, $fld, $label, $type, $options = array(), $args = array()) {
-		$value = array_key_exists($fld,$instance) ? $instance[$fld] : false;
-		print FooterCredits::form_field(
-			$this->get_field_id($fld), $this->get_field_name($fld), $label, $value, $type, $options, $args);
-	}
-
+	public static function is_landing_page() {
+		if (is_page()) {
+			global $post;
+			$page_template_file = get_post_meta($post->ID,'_wp_page_template',true);
+			// you can add your own landing page templates to the array using the filter
+			$landing_page_templates = (array) apply_filters('footer_putter_landing_page_templates', self::$landing_page_templates);
+			return in_array($page_template_file, $landing_page_templates );
+		} else {
+			return false;
+		}	
+	}	
+  }
 }

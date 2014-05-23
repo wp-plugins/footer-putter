@@ -1,32 +1,24 @@
 <?php
-class FooterTrademarksAdmin {
+if (!class_exists('Footer_Trademarks_Admin')) {
+ class Footer_Trademarks_Admin {
     const CODE = 'footer-putter'; //prefix ID of CSS elements
 	const SLUG = 'trademarks';
     const FIELDNAME = 'not_on_404';
 
-    private static $version;
-    private static $parenthook;
     private static $slug;
     private static $screen_id;
 
-	public static function init($parent) {		
-		self::$version = FooterCredits::VERSION;		
-		self::$parenthook = $parent;
-	    self::$slug = self::$parenthook . '-' . self::SLUG;
-	    self::$screen_id = self::$parenthook.'_page_' . self::$slug;
+	public static function init() {				
+	    self::$slug = Footer_Credits_Plugin::get_slug() . '-' . self::SLUG;
 		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
 	}
 	
-    private static function get_version(){
-		return self::$version;
-	}
-
-    private static function get_parenthook(){
-		return self::$parenthook;
-	}
-
     public static function get_slug(){
 		return self::$slug;
+	}
+
+ 	public static function get_url() {
+		return admin_url('admin.php?page='.self::get_slug());
 	}
 		
     private static function get_screen_id(){
@@ -41,8 +33,9 @@ class FooterTrademarksAdmin {
 	}	
 
 	public static function admin_menu() {
-		add_submenu_page(self::get_parenthook(), __('Trademarks'), __('Trademarks'), 'manage_options', 
+		add_submenu_page(Footer_Credits_Plugin::get_slug(), __('Footer Trademarks'), __('Footer Trademarks'), 'manage_options', 
 			self::get_slug(), array(__CLASS__,'settings_panel'));
+	    self::$screen_id = Footer_Credits_Plugin::get_slug().'_page_' . self::$slug;
 		add_action('load-'.self::get_screen_id(), array(__CLASS__, 'load_page'));			
 	}
 
@@ -51,12 +44,12 @@ class FooterTrademarksAdmin {
 	}
 
 	public static function enqueue_styles() {
-		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(), self::get_version());
+		wp_enqueue_style(self::CODE.'-admin', plugins_url('styles/admin.css', dirname(__FILE__)), array(), Footer_Credits_Plugin::get_version());
  	}		
 
 	public static function settings_panel() {
  		$this_url = $_SERVER['REQUEST_URI'];
-		$title = sprintf('<h2>%1$s</h2>', __('Footer Trademarks'));		
+		$title = sprintf('<h2 class="title">%1$s</h2>', __('Footer Trademarks'));		
 		$screenshot2 = plugins_url('images/add-link-category.jpg',dirname(__FILE__));		
 		$screenshot3 = plugins_url('images/add-link.jpg',dirname(__FILE__));
 		$linkcat = admin_url('edit-tags.php?taxonomy=link_category');
@@ -64,7 +57,7 @@ class FooterTrademarksAdmin {
 		$widgets = admin_url('widgets.php');
 ?>
 <div class="wrap">
-<?php screen_icon(); echo $title; ?>
+<?php echo $title; ?>
 <div id="poststuff" class="metabox-holder"><div id="post-body"><div id="post-body-content">
 <p class="notice">There are no settings on this page.</p>
 <p class="notice">However, links are provided to where you set up trademarks or other symbols you want to appear in the footer.</p>
@@ -89,5 +82,5 @@ area and select <i>Trademarks</i> as the link category.</p>
 </div></div><br class="clear"/></div></div>
 <?php
 	}   
+ }
 }
-?>

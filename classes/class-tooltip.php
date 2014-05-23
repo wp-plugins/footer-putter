@@ -1,7 +1,6 @@
 <?php
-if (!class_exists('DIYTooltip')) {
-  class DIYTooltip {
-    const DOMAIN = 'diytooltip';
+if (!class_exists('DIY_Tooltip')) {
+  class DIY_Tooltip {
 	private $labels = array();
 	private $tabindex;	
 	function __construct($labels) {
@@ -10,11 +9,11 @@ if (!class_exists('DIYTooltip')) {
 	}
 
 	function heading($label) {
-		return array_key_exists($label,$this->labels) ? __($this->labels[$label]['heading'],self::DOMAIN) : ''; 
+		return array_key_exists($label,$this->labels) ? __($this->labels[$label]['heading']) : ''; 
 	}
 
 	function text($label) {
-		return array_key_exists($label,$this->labels) ? __($this->labels[$label]['tip'],self::DOMAIN) : ''; 
+		return array_key_exists($label,$this->labels) ? __($this->labels[$label]['tip']) : ''; 
 	}
 
 	function label($label, $text_only=false) {
@@ -28,4 +27,3 @@ if (!class_exists('DIYTooltip')) {
 	}
   }
 }
-?>
