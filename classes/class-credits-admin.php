@@ -172,7 +172,7 @@ INTRO_PANEL;
 <label>{$tip3}</label><input type="text" name="address" size="80" value="{$terms['address']}" /><br/>
 OWNER_PANEL;
         if (Footer_Credits::is_html5()) print <<< ADDRESS_DATA
-<p>Leave the above address field blank and fill in the various parts of the organization address below if you want to use HTML5 microdata.</p>
+<p>Leave the above address field blank and fill in the various parts of the organization address below if you want to be able to use HTML5 microdata.</p>
 <h4>Organization Address</h4>
 <label>{$tip4}</label><input type="text" name="street_address" size="30" value="{$terms['street_address']}" /><br/>
 <label>{$tip5}</label><input type="text" name="locality" size="30" value="{$terms['locality']}" /><br/>

@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 1.9
+Stable tag: 1.10
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,23 +48,16 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.10 = Updated tooltips to use dash-icons font
+
 = 1.9 = Added title to Footer Trademarks Widget, improved control over widgets on landing pages with a filter hook, improved online documentation, refactored code in accordance with current WordPress coding standards.
-= 1.8 = Added options to use HTML5 microdata and location geo-coordinates for the business location and to apply rel=nofollow to footer trademark links
-= 1.7.1 = Fix bug when loaded under AJAX
-= 1.7 = Made email address a mailto link. Added pre-defined classes, tiny and small, to make it easy to use a smaller font size in the footer on pages such as landing pages. Added widget visibility setting to make it easy to either hide or show the footer widgets on landing pages. Replaced the plugin icon image in admin menu with a dashicons font character. Automatically uses HTML5 if theme supports HTML5 - no manual setting required.
-= 1.6 = Add option to include email address in the copyright footer widget, remove the automatic adding of rel=nofollow in footer links, and add optional sub-footer sections to the privacy and terms pages
-= 1.5 = Use Javascript for Return To Top link to make it work on HTML5 sites, and strengthen CSS to ensure footer copyright and trademark widgets are full width
-= 1.4.1 = Reinstate support for PHP 5.2
-= 1.4 = Added support for HTML5 themes
-= 1.3 = Pre-configure according to the WordPress theme
-= 1.2 = Fix display of telephone number
-= 1.1 = Fix link in admin.php from screenshot1.jpg to screenshot-1.jpg
-= 1.0 = Initial release
+
+For full version history please see http://www.diywebmastery.com/plugins/footer-putter/footer-putter-version-history/
 
 == Upgrade Notice ==
 
-= 1.9 = 
-* Optional - Added title to Footer Trademarks Widget, improved control over use on landing pages and better documentation
+= 1.10 = 
+* Optional - Updated tooltips to use dash-icons font
 
 == Links ==
 
