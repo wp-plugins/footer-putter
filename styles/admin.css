@@ -9,3 +9,11 @@ div.icon32 { background-image : url(../images/icon-32.png); background-repeat: n
 p.notice { font-size: 1.6em; font-weight: bold; }
 p.important { font-size: 1.2em; color: red; }
 img.dashed-border { padding: 10px; border: 1px dashed silver; max-width: 100%; } 
+h2.title:before, h3.title:before {
+    content: '\f346';
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    font: normal 29px/1 'dashicons';
+    vertical-align: middle;
+    margin-right: 0.3em;
+}
