@@ -1,4 +1,4 @@
-#footer .footer-center, #footer .return-center, .footer-center, .return-center { text-align: center; margin: 10px 0px; border:none;}
+#footer .footer-center, #footer .return-center, .footer-center, .return-center { text-align: center; padding: 10px 0px; border:none;}
 #footer .return-left, .return-left { float: left; width : 20%; }
 #footer .footer-right, .footer-right { float: right; text-align: right; width: 70%; margin-bottom: 10px; }
 #footer #footer-credits ul, #footer #footer-credits ul li, #footer-credits ul, #footer-credits ul li  {
@@ -14,7 +14,7 @@
 #footer-credits span.copyright, #footer-credits span.telephone, #footer-credits span.address, 
 #footer-credits a.email, #footer-credits a.map {
         font-weight: normal; letter-spacing : normal; text-transform: none; margin: 0 10px; vertical-align: middle;
-        background: inherit; border : none; float: none; display: inline;  color: inherit; text-decoration: none; }
+        background: none; border : none; float: none; display: inline;  color: inherit; text-decoration: none; }
         
 #footer-credits.dark,  #footer-credits.dark li, #footer-credits.dark a, #footer-return.dark a , #footer-return.dark a:visited { color : #222222; }
 #footer-credits.light, #footer-credits.light li, #footer-credits.light a, #footer-return.light a, #footer-return.light a:visited { color : #DDDDDD; }
