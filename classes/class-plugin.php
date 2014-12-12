@@ -1,26 +1,23 @@
 <?php
-class Footer_Credits_Plugin {
+class Footer_Putter_Plugin {
 
- 	private static $path = FOOTER_PUTTER_PATH;
- 	private static $slug = FOOTER_PUTTER_PLUGIN_NAME;
- 	private static $version = FOOTER_PUTTER_VERSION;
- 	
-    public static function get_path(){
-		return self::$path;
+	protected static $links = array();
+
+	public static function get_link_url($key) {
+		if (array_key_exists($key, self::$links))
+			return self::$links[$key];
+		else
+			return ('#');
 	}
 
-    public static function get_slug(){
-		return self::$slug;
-	}
-	
-	public static function get_version(){
-		return self::$version;
-	}
-
-	public static function init() {
+ 	public static function init() {
 		$dir = dirname(__FILE__) . '/';
+		require_once($dir . 'class-diy-options.php');
+		require_once($dir . 'class-options.php');
+		require_once($dir . 'class-utils.php');
 		require_once($dir . 'class-footer.php');
 		require_once($dir . 'class-footer-widgets.php');
+		Footer_Credits_Options::init();
 		Footer_Credits::init();
 	}
 	
@@ -28,20 +25,15 @@ class Footer_Credits_Plugin {
 		$dir = dirname(__FILE__) . '/';
 		require_once($dir . 'class-tooltip.php');
 		require_once($dir . 'class-admin.php');
+		require_once($dir . 'class-dashboard.php');
 		require_once($dir . 'class-credits-admin.php');
-		require_once($dir . 'class-trademarks-admin.php');
-		Footer_Putter_Admin::init();
-		Footer_Credits_Admin::init();	
-		Footer_Trademarks_Admin::init();	
-		add_filter('pre_option_link_manager_enabled', '__return_true' );
-		add_filter('plugin_action_links',array(__CLASS__, 'plugin_action_links'), 10, 2 );
-	}
+		require_once($dir . 'class-trademarks-admin.php');		
+		$intro = new Footer_Putter_Dashboard(FOOTER_PUTTER_VERSION, FOOTER_PUTTER_PATH, FOOTER_PUTTER_PLUGIN_NAME);
+		self::$links['intro'] = $intro->get_url();
+		$credits = new Footer_Credits_Admin(FOOTER_PUTTER_VERSION, FOOTER_PUTTER_PATH, FOOTER_PUTTER_PLUGIN_NAME,'credits');	
+		self::$links['credits'] = $credits->get_url();
+		$trademarks = new Footer_Trademarks_Admin(FOOTER_PUTTER_VERSION, FOOTER_PUTTER_PATH, FOOTER_PUTTER_PLUGIN_NAME,'trademarks');	
+		self::$links['trademarks'] = $trademarks->get_url();
+	}	
 
-	static function plugin_action_links( $links, $file ) {
-		if ( is_array($links) && (self::get_path() == $file )) {
-			$settings_link = '<a href="' . admin_url( 'admin.php?page='.self::get_slug()) . '">Settings</a>';
-			array_unshift( $links, $settings_link );
-		}
-		return $links;
-	}
 }

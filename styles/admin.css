@@ -1,19 +1,4 @@
-div.icon32 { background-image : url(../images/icon-32.png); background-repeat: no-repeat;}
-#poststuff { margin-right: 20px; }
-#poststuff img { max-width : 100%; }
-#poststuff input[type=checkbox] { margin-left: 4px; }
-#poststuff input.error, #poststuff select.error { border: 1px solid red; background-color : #FEE; } 
-#poststuff div#message { margin-left: 10px; display: inline; padding: 10px; }
-#poststuff div#message div.updated { margin-left: 30px; padding: 8px; display: inline; }
-#poststuff label { display: inline-block; min-width: 150px; margin-right: 10px;}
-p.notice { font-size: 1.6em; font-weight: bold; }
-p.important { font-size: 1.2em; color: red; }
+h2.title i { padding-right: 0.25em; vertical-align: top; font-size: 1.2em;}
 img.dashed-border { padding: 10px; border: 1px dashed silver; max-width: 100%; } 
-h2.title:before, h3.title:before {
-    content: '\f346';
-    display: inline-block;
-    -webkit-font-smoothing: antialiased;
-    font: normal 29px/1 'dashicons';
-    vertical-align: middle;
-    margin-right: 0.3em;
-}
+p.bigger { font-size: larger; font-weight: bold; }
+#footer-putter-intro { padding-right: 180px; background: url(../images/logo.png) right 40px no-repeat;}

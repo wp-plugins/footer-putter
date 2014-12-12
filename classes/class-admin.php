@@ -1,109 +1,275 @@
 <?php
-class Footer_Putter_Admin {
-    const CODE = 'footer-putter';
-    
-    private static $screen_id;
-		
-    private static function get_screen_id(){
-		return self::$screen_id;
-	}
+abstract class Footer_Putter_Admin {
+	protected $version;
+	protected $path;
+	protected $parent_slug;
+	protected $slug;
+    protected $screen_id;
+    private $tooltips;
+    private $tips = array();
 
-	static function init() {
-		add_action('admin_menu',array(__CLASS__, 'admin_menu'));
-		add_action('admin_print_styles',array(__CLASS__, 'style_icon'));		
-	}
-
-	static function style_icon() {
-		print <<< STYLES
-<style type="text/css">
-#adminmenu .menu-icon-generic.toplevel_page_footer-putter div.wp-menu-image:before { content: '\\f346'; }
-</style>
-STYLES;
-	}
-
-	static function admin_menu() {
-		$intro = sprintf('Intro (v%1$s)', Footer_Credits_Plugin::get_version());
-		self::$screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
-			Footer_Credits_Plugin::get_slug(), array(__CLASS__,'settings_panel') );
-		add_submenu_page(Footer_Credits_Plugin::get_slug(), FOOTER_PUTTER_FRIENDLY_NAME, $intro, 'manage_options', Footer_Credits_Plugin::get_slug(), array(__CLASS__,'settings_panel') );
+	function __construct($version, $path, $parent_slug, $slug = '') {
+		$this->version = $version;
+		$this->path = $path;
+		$this->parent_slug = $parent_slug;
+		if (empty($slug))
+			$this->slug = $this->parent_slug;
+		else
+			$this->slug = $this->parent_slug.'-'.$slug;
+		$this->tooltips = new Footer_Putter_Tooltip($this->tips);
+		$this->init();
 	}
 	
-	static function settings_panel() {
-    	$home_url = FOOTER_PUTTER_HOME_URL;
-     	$plugin = FOOTER_PUTTER_FRIENDLY_NAME;
-  		$version = FOOTER_PUTTER_VERSION;
-    	$widgets_url = admin_url('widgets.php');
-    	$credits_url = Footer_Credits_Admin::get_url(); 
-    	$trademarks_url = Footer_Trademarks_Admin::get_url(); 
- 		$screenshot = plugins_url('screenshot-1.jpg',dirname(__FILE__));    	
-		$logo = plugins_url('images/logo.png', dirname(__FILE__));    	
-    	print <<< ADMIN_PANEL
-<div class="wrap">
-<h2>{$plugin} {$version} Overview</h2>
-<img class="alignright" src="{$logo}" alt="Footer Putter Plugin" />
-
-<p>{$plugin} allows you to put a footer to your site that adds credibility to your site, with BOTH visitors and search engines.</p>
-<p>Google is looking for some indicators that the site is about a real business.</p>
-<ol>
-<li>The name of the business or site owner</li>
-<li>A copyright notice that is up to date</li>
-<li>A telephone number</li>
-<li>A postal address</li>
-<li>Links to Privacy Policy and Terms of Use pages</p>
-</ol>
-
-<p>Human visitors may pay some credence to this information but will likely be more motivated by trade marks, trust marks and service marks.</p>
-
-<h2>{$plugin} Widgets</h2>
-
-The plugins define two widgets: 
-<ol>
-<li>a <b>Footer Copyright Widget</b> that places a line at the foot of your site containing as many of the items listed above that you want to disclose.</li>
-<li>a <b>Trademarks Widget</b> that displays a line of trademarks that you have previously set up as "Links".
-</ol>
-<p>Typically you will drag both widgets into the Custom Footer Widget Area.</p>
-
-<h2>Instructions For Building A Footer</h2>
-<h3>Create Standard Pages And Footer Menu</h3>
-<ol>
-<li>Create a <i>Privacy Policy</i> page with the slug/permalink <em>privacy</em>, choose a page template with no sidebar.</li>
-<li>Create a <i>Terms of Use</i> page with the slug/permalink <em>terms</em>, choose a page template with no sidebar.</li>
-<li>Create a <i>Contact</i> page with a contact form.</li>
-<li>Create an <i>About</i> page, with information either about the site or about its owner.</li>
-<li>If the site is selling an information product you may want to create a <i>Disclaimer</i> page, regarding any claims about the product performance.</li>
-<li>Create a WordPress menu called <i>Footer Menu</i> with the above pages.</li>
-</ol>
-<h3>Update Business Information</h3>
-<ol>
-<li>Go to <a href="{$credits_url}">Footer Credits</a> and update the Site Owner details, contact and legal information.</li>
-<li>Optionally include contact details such as telephone and email. You may also want to add Geographical co-ordinates for your office location for the purposes of local search.</li>
-</ol>
-<h3>Create Trademark Links</h3>
-<ol>
-<li>Go to <a href="{$trademarks_url}"><i>Footer Trademarks</i></a> and follow the instructions:</li>
-<li>Create a link category with a name such as <i>Trademarks</i></li>
-<li>Add a link for each of your trademarks and put each in the <i>Trademarks</i> link category</li>
-<li>For each link specify the link URL and the image URL</li>
-</ol>
-<h3>Set Up Footer Widgets</h3>
-<ol>
-<li>Go to <a href="{$widgets_url}"><i>Appearance > Widgets</i></a></li>
-<li>Drag a <i>Footer Copyright Widget</i> and a <i>Footer Trademarks widget</i> into a suitable footer Widget Area</li>
-<li>For the <i>Footer Trademarks</i> widget and choose your link category, e.g. <i>Trademarks</i>, and select a sort order</li>
-<li>For the <i>Footer Copyright</i> widget, select the <i>Footer Menu</i> and choose what copyright and contact information you want to you display</li>
-<li>Review the footer of the site. You can use the widget to change font sizes and colors using pre-defined classes such as <i>tiny</i>, <i>small</i>, <i>dark</i>, <i>light</i> or <i>white</i> or add your own custom classes</li> 
-<li>You can also choose to suppress the widgets on special pages such as landing pages.</li> 
-<li>If the footer is not in the right location you can use the <i>Footer Hook</i> feature described below to add a new widget area called <i>Credibility Footer</i> where you can locate the footer widgets.</li> 
-</ol>
-
-<h3>Footer Hook</h3>
-<p>The footer hook is only required if your theme does not already have a footer widget area into which you can drag the two widgets.</p>
-<p>For some themes, the footer hook is left blank, for others use a WordPress hook such as <i>get_footer</i> or <i>wp_footer</i>, 
-or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, 
-<i>twentythirteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc.</p>
-
-<h3>Getting Help</h3>
-<p>Check out the <a href="{$home_url}">Footer Putter Plugin page</a> for more information about the plugin.</p> 
-ADMIN_PANEL;
+    function get_screen_id(){
+		return $this->screen_id;
 	}
+
+	function get_version() {
+		return $this->version;
+	}
+
+    function get_path() {
+		return $this->path;
+	}
+
+    function get_parent_slug() {
+		return $this->parent_slug;
+	}
+
+    function get_slug() {
+		return $this->slug;
+	}
+
+ 	function get_url() {
+		return admin_url('admin.php?page='.$this->get_slug());
+	}
+
+ 	function get_code($code='') {
+ 		$format = empty($code) ? '%1$s' : '%1$s-%2$s';	
+		return sprintf($format, $this->get_parent_slug(), $code);
+	}
+	
+	function get_keys() { 
+		return array_keys($this->tips);
+	}
+
+	function get_tip($label) { 
+		return $this->tooltips->tip($label);
+	}
+
+	function plugin_action_links ( $links, $file ) {
+		if ( is_array($links) && ($this->get_path() == $file )) {
+			$settings_link = '<a href="' .$this->get_url() . '">Settings</a>';
+			array_unshift( $links, $settings_link );
+		}
+		return $links;
+	}
+
+	function set_tooltips($tips) {
+		$this->tips = $tips;
+		$this->tooltips = new Footer_Putter_Tooltip($this->tips);
+		$this->add_tooltip_support();
+	}
+	
+	function add_tooltip_support() {
+		add_action('admin_enqueue_scripts', array( $this, 'enqueue_tooltip_styles'));
+		add_action('admin_enqueue_scripts', array( $this, 'enqueue_color_picker_styles'));
+		add_action('admin_enqueue_scripts', array( $this, 'enqueue_color_picker_scripts'));
+	}
+	
+	function register_tooltip_styles() {
+		wp_register_style('diy-tooltip', plugins_url('styles/tooltip.css',dirname(__FILE__)), array(), $this->get_version());
+	}	
+
+	function register_admin_styles() {
+		wp_register_style($this->get_code('admin'), plugins_url('styles/admin.css',dirname(__FILE__)), array(),$this->get_version());
+	}
+
+	function enqueue_admin_styles() {
+		wp_enqueue_style($this->get_code('admin'));
+ 	}
+
+	function enqueue_tooltip_styles() {
+		wp_enqueue_style('diy-tooltip');
+		wp_enqueue_style('dashicons');
+	}	
+
+	function enqueue_color_picker_styles() {
+        wp_enqueue_style('wp-color-picker');
+	}
+
+	function enqueue_color_picker_scripts() {
+		wp_enqueue_script('wp-color-picker');
+		add_action('admin_print_footer_scripts', array($this, 'enable_color_picker'));
+ 	}
+
+    function enable_color_picker() {
+	    print <<< SCRIPT
+	<script type="text/javascript">
+		//<![CDATA[
+		jQuery(document).ready( function($) {
+	        $('.color-picker').wpColorPicker();
+		});
+		//]]>
+	</script>
+SCRIPT;
+    }
+
+	function enqueue_postbox_scripts() {
+		wp_enqueue_script('common');
+		wp_enqueue_script('wp-lists');
+		wp_enqueue_script('postbox');	
+		add_action('admin_footer-'.$this->get_screen_id(), array($this, 'toggle_postboxes'));
+ 	}
+ 		
+	function toggle_postboxes() {
+		$hook = $this->get_screen_id();
+    	print <<< SCRIPT
+<script type="text/javascript">
+//<![CDATA[
+jQuery(document).ready( function($) {
+	$('.if-js-closed').removeClass('if-js-closed').addClass('closed');
+	postboxes.add_postbox_toggles('{$hook}');
+});
+//]]>
+</script>
+SCRIPT;
+    }	
+
+ 	function add_meta_box($code, $title, $callback_func, $callback_params = null, $context = 'normal', $priority = 'core', $post_type = false ) {
+		if (empty($post_type)) $post_type = $this->get_screen_id();
+		add_meta_box($this->get_code($code), __($title), array($this, $callback_func), $post_type, $context, $priority, $callback_params);
+	}
+
+	function form_field($id, $name, $label, $value, $type, $options = array(), $args = array(), $wrap = false) {
+		if (!$label) $label = $id;
+		$label_args = (is_array($args) && array_key_exists('label_args', $args)) ? $args['label_args'] : false;
+ 		return Footer_Putter_Utils::form_field($id, $name, $this->tooltips->tip($label, $label_args), $value, $type, $options, $args, $wrap);
+ 	}	
+
+	function print_form_field($fld, $value, $type, $options = array(), $args = array(), $wrap = false) {
+ 		print $this->form_field($fld, $fld, false, $value, $type, $options, $args, $wrap);
+ 	}	
+
+	function print_text_field($fld, $value, $args = array()) {
+ 		$this->print_form_field($fld, $value, 'text', array(), $args);
+ 	}
+ 	
+	function admin_heading($title = '', $icon_class = '') {
+		if (empty($title)) $title = sprintf('%1$s %2$s', ucwords(str_replace('-',' ',$this->slug)), $this->get_version());
+		$icon = empty($icon_class) ? '' : sprintf('<i class="%1$s"></i>', 
+			'dashicons-'==substr($icon_class,0,10) ?  ('dashicons '.$icon_class) : $icon_class) ;
+    	return sprintf('<h2 class="title">%2$s%1$s</h2>', $title, $icon);				
+	}
+
+	function print_admin_form_with_sidebar_start($title) {
+    	print <<< ADMIN_START
+<div class="wrap">
+{$title}
+<div id="poststuff" class="metabox-holder has-right-sidebar">
+<div id="side-info-column" class="inner-sidebar">
+ADMIN_START;
+	}
+
+	function print_admin_form_with_sidebar_middle() {
+		$this_url = $_SERVER['REQUEST_URI'];
+	    print <<< ADMIN_MIDDLE
+</div>
+<div id="post-body" class="has-sidebar"><div id="post-body-content" class="has-sidebar-content diy-wrap">
+<form id="diy_options" method="post" action="{$this_url}">
+ADMIN_MIDDLE;
+	}
+	
+	function print_admin_form_start($title, $enctype = false) {
+	 	$this_url = $_SERVER['REQUEST_URI'];
+	 	$enctype = $enctype ? 'enctype="multipart/form-data" ' : '';
+    	print <<< ADMIN_START
+<div class="wrap">
+{$title}
+<div id="poststuff" {$enctype}class="metabox-holder"><div id="post-body"><div id="post-body-content">
+<form id="diy_options" method="post" {$enctype}action="{$this_url}">
+ADMIN_START;
+	}
+	
+	function print_admin_form_end($referer = false, $keys = false, $button_text = 'Save Changes') {
+		$nonces = $referer ? $this->get_nonces($referer) : '';
+		$page_options = $button = '';
+		if ($keys) {
+			$keys = is_array($keys) ? implode(',', $keys) : $keys;
+			$page_options = sprintf('<input type="hidden" name="page_options" value="%1$s" />', $keys);
+			$button = $this->submit_button($button_text);
+		}
+		print <<< ADMIN_END
+<p class="submit">{$button}{$page_options}{$nonces}</p>
+</form></div></div><br class="clear"/></div></div>
+ADMIN_END;
+	}
+	
+	function get_nonces($referer) {
+		return wp_nonce_field($referer, '_wpnonce', true, false).
+			wp_nonce_field('closedpostboxes', 'closedpostboxesnonce', false, false ).
+			wp_nonce_field('meta-box-order', 'meta-box-order-nonce', false, false);
+	}
+	
+ 	function submit_button($button_text='Save Changes') {	
+		return sprintf('<input type="submit" name="options_update" value="%1$s" class="button-primary" />', $button_text);
+	}
+ 	
+	function save_options($options_class, $settings_name, $trim_option_prefix = false) {
+	
+  		$page_options = explode(",", stripslashes($_POST['page_options']));
+  		
+  		if (is_array($page_options)) {
+  			$options = call_user_func( array($options_class, 'get_options'));
+  			$updates = false; 
+    		foreach ($page_options as $option) {
+       			$option = trim($option);
+       			$val = array_key_exists($option, $_POST) ? trim(stripslashes($_POST[$option])) : '';
+       			if ($trim_option_prefix) $option = substr($option,$trim_option_prefix); //remove prefix
+				$options[$option] = $val;
+    		} //end for
+   			$saved = call_user_func( array($options_class, 'save_options'), $options) ;
+   			if ($saved)  {
+	  		    $class='updated fade';		
+       			$message = 'settings saved successfully.';
+   			} else {
+ 	 		    $class='error fade';
+       			$message = 'settings have not been changed.';
+			}
+  		} else {
+  		    $class='error';
+       		$message= 'settings not found!';
+  		}
+  		return sprintf('<div id="message" class="%1$s"><p>%2$s %3$s</p></div>',
+  			$class, __($settings_name), __($message));
+	}
+
+    function fetch_message() {
+		$message = '' ;
+		if (isset($_REQUEST['message']) && ! empty($_REQUEST['message'])) { 
+			$message = urldecode($_REQUEST['message']);
+			$_SERVER['REQUEST_URI'] = remove_query_arg(array('message'), $_SERVER['REQUEST_URI']);
+			$style = strpos($message,'success') !== FALSE ? ' success' : (strpos($message,'fail') !== FALSE ? ' error' : '');
+			$message = sprintf('<div class="updated %2$$">%1$s</div>',$message,$style); 
+		}
+		return $message;
+    } 
+
+	function screen_layout_columns($columns, $screen) {
+		if (!defined( 'WP_NETWORK_ADMIN' ) && !defined( 'WP_USER_ADMIN' )) {
+			if ($screen == $this->get_screen_id()) {
+				$columns[$this->get_screen_id()] = 2;
+			}
+		}
+		return $columns;
+	}
+
+	abstract function init() ;
+
+	abstract function admin_menu() ;
+
+	abstract function page_content(); 
+
+	abstract function load_page();
+	
 }

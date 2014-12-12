@@ -3,8 +3,8 @@ Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.0
-Tested up to: 3.9.1
-Stable tag: 1.10
+Tested up to: 4.0.1
+Stable tag: 1.11
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,8 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.11 = Add option to set Copyright Text
+
 = 1.10 = Updated tooltips to use dash-icons font
 
 = 1.9 = Added title to Footer Trademarks Widget, improved control over widgets on landing pages with a filter hook, improved online documentation, refactored code in accordance with current WordPress coding standards.
@@ -56,8 +58,8 @@ For full version history please see http://www.diywebmastery.com/plugins/footer-
 
 == Upgrade Notice ==
 
-= 1.10 = 
-* Optional - Updated tooltips to use dash-icons font
+= 1.11 = 
+* Optional - Add option to set Copyright Text
 
 == Links ==
 
