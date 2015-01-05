@@ -1,7 +1,7 @@
 <?php
 class Footer_Putter_Tooltip {
 
-    const HELP = '<span class="dashicons dashicons-editor-help"></span>';      
+   const HELP = '<span class="dashicons dashicons-editor-help"></span>';      
 
 	private $labels = array();
 	private $tabindex;
@@ -28,12 +28,12 @@ class Footer_Putter_Tooltip {
 	function tip($label,$args=false) {
 		$heading = $this->heading($label, $args); 
 		return $heading ? sprintf('<a href="#" class="diy-tooltip" tabindex="%3$s">%1$s<span class="tip">%2$s</span></a>',
-			$heading, $this->text($label, $args), $this->tabindex++) : ucwords($label);
+			$heading, $this->text($label, $args), $this->tabindex++) : ucfirst($label);
 	}
 
 	function apply_args($content, $args = false) {
 		if ($args && (strpos($content, '$s') !== FALSE)) {
-			if (is_array($args)) 
+			if (is_array($args))
 				switch (count($args)) {
 					case 4: $content = sprintf($content, $args[0], $args[1], $args[2], $args[3]);
 					case 3: $content = sprintf($content, $args[0], $args[1], $args[2]);

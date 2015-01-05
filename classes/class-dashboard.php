@@ -4,35 +4,39 @@ class Footer_Putter_Dashboard extends Footer_Putter_Admin {
 	function init() {
 		add_action('admin_menu', array($this, 'admin_menu'));
 		add_action('load-widgets.php', array($this, 'add_tooltip_support'));
-        add_action('admin_enqueue_scripts', array($this ,'register_tooltip_styles'));
-        add_action('admin_enqueue_scripts', array($this ,'register_admin_styles'));
+      add_action('admin_enqueue_scripts', array($this ,'register_tooltip_styles'));
+      add_action('admin_enqueue_scripts', array($this ,'register_admin_styles'));
 		add_filter('plugin_action_links',array($this, 'plugin_action_links'), 10, 2 );
 	}
 
 	function admin_menu() {
-		$intro = sprintf('Intro (v%1$s)', $this->get_version());
-		$this->screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
-			$this->get_slug(), array($this,'page_content'), FOOTER_PUTTER_ICON );
-		add_submenu_page($this->get_slug(), FOOTER_PUTTER_FRIENDLY_NAME, $intro, 'manage_options', $this->get_slug(), array($this,'page_content') );
-		add_action('load-'.$this->get_screen_id(), array($this, 'load_page'));
+      $intro = sprintf('Intro (v%1$s)', $this->get_version());
+      $this->screen_id = add_menu_page(FOOTER_PUTTER_FRIENDLY_NAME, FOOTER_PUTTER_FRIENDLY_NAME, 'manage_options', 
+      $this->get_slug(), array($this,'page_content'), FOOTER_PUTTER_ICON );
+      add_submenu_page($this->get_slug(), FOOTER_PUTTER_FRIENDLY_NAME, $intro, 'manage_options', $this->get_slug(), array($this,'page_content') );
+      add_action('load-'.$this->get_screen_id(), array($this, 'load_page'));
 	}
 
 	function page_content() {
  		$title = $this->admin_heading('Footer Putter', FOOTER_PUTTER_ICON);				
-		$this->print_admin_form_start($title); 
+		$this->print_admin_form_with_sidebar_start($title); 
+		do_meta_boxes($this->get_screen_id(), 'side', null); 
+		$this->print_admin_form_with_sidebar_middle();
 		do_meta_boxes($this->get_screen_id(), 'normal', null); 
 		$this->print_admin_form_end(__CLASS__);
 	} 
 
 	function load_page() {
 		$this->add_tooltip_support();
-        add_action('admin_enqueue_scripts', array($this, 'register_admin_styles'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_postbox_scripts'));
+      add_action('admin_enqueue_scripts', array($this, 'register_admin_styles'));
+      add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
+      add_action('admin_enqueue_scripts', array($this, 'enqueue_postbox_scripts'));
 		$this->add_meta_box('intro', 'Introduction',  'intro_panel');
 		$this->add_meta_box('widgets','Widgets', 'widgets_panel');
 		$this->add_meta_box('instructions', 'Instructions',  'instructions_panel');
 		$this->add_meta_box('hooks', 'Footer Hook',  'hooks_panel');
+		$this->add_meta_box('links', 'Useful Links', 'links_panel', null, 'side');
+		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel', null, 'side');
 	}
 		
 	function intro_panel() {
@@ -115,4 +119,21 @@ or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_c
 <p>Check out the <a href="{$home_url}">{$plugin} page</a> for more information about the plugin.</p> 
 HOOKS_PANEL;
 	}
+	
+	function links_panel() {
+		$home = FOOTER_PUTTER_HOME_URL;	
+ 		print <<< LINKS_PANEL
+<ul>
+<li><a rel="external" href="{$home}">Footer Putter Plugin Home</a></li>
+<li><a rel="external" href="http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks/">Themes and Recommended Footer Hooks</a></li>
+<li><a rel="external" href="http://www.diywebmastery.com/4098/how-to-add-a-different-footer-on-landing-pages/">How To Use A Different Footer On Landing Pages</a></li>
+<li><a rel="external" href="http://www.diywebmastery.com/4109/using-html5-microdata-footer/">Using HTML5 Microdata for better SEO and Local Search</a></li>
+</ul>
+LINKS_PANEL;
+	}
+	
+ 	function news_panel($post,$metabox){	
+		Footer_Putter_Feed_Widget::display_feeds();
+	}
+	
 }

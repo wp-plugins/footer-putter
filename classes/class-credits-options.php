@@ -7,26 +7,26 @@ class Footer_Credits_Options  {
 	
 	protected static $defaults = array(
 		'terms' => array(
-			'site' => '',
-			'owner' => '',
-			'address' => '',
-            'street_address' => '',
-            'locality' => '',
-            'region' => '',
-            'postal_code' => '',
-			'country' => '',
-            'latitude' => '',
-            'longitude' => '',
-            'map' => '',
-			'email' => '',
-			'telephone' => '',
-			'copyright' => '',
-			'copyright_start_year' => '',
-			'copyright_preamble' => '',
-			'courts' => '',
-            'updated' => '',
-			'privacy_contact' => '',
-			'terms_contact' => ''),
+		'site' => '',
+		'owner' => '',
+		'address' => '',
+      'street_address' => '',
+      'locality' => '',
+      'region' => '',
+      'postal_code' => '',
+		'country' => '',
+      'latitude' => '',
+      'longitude' => '',
+      'map' => '',
+		'email' => '',
+		'telephone' => '',
+		'copyright' => '',
+		'copyright_start_year' => '',
+		'copyright_preamble' => '',
+		'courts' => '',
+      'updated' => '',
+		'privacy_contact' => '',
+		'terms_contact' => ''),
 		'nav_menu' => 0,
 		'center' => true,
 		'two_lines' => true,
@@ -45,7 +45,7 @@ class Footer_Credits_Options  {
 		'footer_remove' => true,
  		'footer_filter_hook' => '',
  		'visibility' => '' ,
-        'use_microdata' => false
+      'use_microdata' => false
 	);
 	
 	public static function init() {
@@ -114,18 +114,18 @@ class Footer_Credits_Options  {
     private static function get_default_term($key) {
 		$default='';
     	switch ($key) {
-   			case 'owner' : $default = self::get_term('site'); break;
-   			case 'copyright' : $default = self::get_copyright(self::get_term('copyright_start_year')); break;
-   			case 'copyright_start_year': $default = date('Y'); break;
+         case 'owner' : $default = self::get_term('site'); break;
+   		case 'copyright' : $default = self::get_copyright(self::get_term('copyright_start_year')); break;
+   		case 'copyright_start_year': $default = date('Y'); break;
 			case 'copyright_preamble': $default = 'Copyright &copy;'; break;
-   			case 'country' : $default = 'The United States'; break;
-   			case 'courts' : $default = ucwords(sprintf('the courts of %1$s',self::get_term('country'))); break;
-   			case 'email' : $default = 'privacy@'.strtolower(self::get_term('site')); break;
-   			case 'site' : $default = self::get_default_site(); break;
-   			case 'updated' : $default = date('d M Y'); break;
+   		case 'country' : $default = 'The United States'; break;
+   		case 'courts' : $default = ucwords(sprintf('the courts of %1$s',self::get_term('country'))); break;
+   		case 'email' : $default = 'privacy@'.strtolower(self::get_term('site')); break;
+   		case 'site' : $default = self::get_default_site(); break;
+   		case 'updated' : $default = date('d M Y'); break;
  			default: $default='';  //default is blank for others
    		}
-   		return $default;
+   	return $default;
     }
 	
 	private static function theme_specific_defaults() {

@@ -14,7 +14,9 @@ class Footer_Trademarks_Admin extends Footer_Putter_Admin{
 
 	public function page_content() {
  		$title = $this->admin_heading('Footer Trademarks', FOOTER_PUTTER_ICON);				
-		$this->print_admin_form_start($title); 
+		$this->print_admin_form_with_sidebar_start($title); 
+		do_meta_boxes($this->get_screen_id(), 'side', null); 
+		$this->print_admin_form_with_sidebar_middle(); 
 		do_meta_boxes($this->get_screen_id(), 'normal', null); 
 		$this->print_admin_form_end(__CLASS__);
 	} 	
@@ -26,6 +28,7 @@ class Footer_Trademarks_Admin extends Footer_Putter_Admin{
 		$this->add_meta_box('intro', 'Instructions',  'intro_panel');
 		$this->add_meta_box('tips', 'Tips',  'tips_panel');
 		$this->add_meta_box('screenshots','Screenshots',  'screenshots_panel');
+		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel',null, 'side');
 	}	
 
 	public function intro_panel() {
@@ -36,11 +39,11 @@ class Footer_Trademarks_Admin extends Footer_Putter_Admin{
 <p class="attention">There are no settings on this page.</p>
 <p class="attention">However, links are provided to where you set up trademarks or other symbols you want to appear in the footer.</p>
 
-<p class="bigger">Firstly go to the <a href="{$linkcat}">Link Categories</a> and set up a link category called <i>Trademarks</i> or something similar.</p>
+<p class="bigger">Firstly go to the <a href="{$linkcat}">Link Categories</a> and set up a link category called <i>Trust Marks</i> or something similar.</p>
 <p class="bigger">Next go to the <a href="{$addlink}">Add Link</a> and add a link for each trademark
 specifying the Image URL, and optionally the link URL and of course adding each link to your chosen link category. 
 <p class="bigger">Finally go to the <a href="{$widgets}">Appearance | Widgets</a> and drag a trademark widget into the custom footer widget
-area and select <i>Trademarks</i> as the link category.</p>
+area and select <i>Trust Marks</i> as the link category.</p>
 INTRO;
 	}  
 
@@ -65,5 +68,9 @@ TIPS;
 <p><img src="{$img2}" alt="Screenshot of adding a trademark link " /></p>
 SCREENSHOTS;
 	}  
+
+ 	function news_panel($post,$metabox){	
+		Footer_Putter_Feed_Widget::display_feeds();
+	}
 
 }

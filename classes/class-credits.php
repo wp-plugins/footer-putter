@@ -282,16 +282,16 @@ PRIVACY;
 <h2>Dispute Resolution</h2>
 <p>These terms, and any dispute arising from the use of this site, will be governed by {$terms['courts']} without regard to its conflicts of laws provisions.</p>
 DISPUTES;
-		$terms = <<< TERMS
+		$feedback = <<< FEEDBACK
 <h2>Feedback And Information</h2> 
 <p>Any feedback you provide at this site shall be deemed to be non-confidential. {$terms['owner']} shall be free to use such information on an unrestricted basis.</p>
 <p>The terms and conditions for this web site are subject to change without notice.<p>
 <p>{$terms['copyright']} {$terms['owner']} All rights reserved.<br/> {$terms['owner']}, {$terms['address']} {$terms['country']}</p>
 <p>Updated by The {$terms['owner']} Legal Team on {$terms['updated']}</p>
-TERMS;
+FEEDBACK;
 		if (strpos($content,'%%') == FALSE) {
 			$content .= $terms['courts'] ? $disputes : '';
-			$content .= $terms['address'] ? $terms : '';
+			$content .= $terms['address'] ? $feedback : '';
 		}
 		return $content ;
 	}
