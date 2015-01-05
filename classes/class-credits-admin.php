@@ -41,7 +41,9 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 
 	function page_content() {
 		$title = $this->admin_heading('Footer Credits',FOOTER_PUTTER_ICON);				
-		$this->print_admin_form_start($title); 
+		$this->print_admin_form_with_sidebar_start($title); 
+		do_meta_boxes($this->get_screen_id(), 'side', null); 
+		$this->print_admin_form_with_sidebar_middle();
 		do_meta_boxes($this->get_screen_id(), 'normal', null); 
 		$this->print_admin_form_end(__CLASS__, $this->get_keys());
 	}   
@@ -57,6 +59,8 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 		$this->add_meta_box('return',  'Return To Top' , 'return_panel', $callback_params);
 		$this->add_meta_box('example',  'Preview Footer Content' , 'preview_panel', $callback_params);
 		$this->add_meta_box('advanced',  'Advanced' , 'advanced_panel', $callback_params);
+		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel',$callback_params, 'side');
+
 	    $this->set_tooltips($this->tips);	
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_credits_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
@@ -66,6 +70,10 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 	function enqueue_credits_styles() {
 		wp_enqueue_style($this->get_code(), plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),$this->get_version());		
 }		
+
+ 	function news_panel($post,$metabox){	
+		Footer_Putter_Feed_Widget::display_feeds();
+	}
 
 	function intro_panel($post,$metabox) {	
 		$message = $metabox['args']['message'];	 	

@@ -157,8 +157,8 @@ SCRIPT;
  	
 	function admin_heading($title = '', $icon_class = '') {
 		if (empty($title)) $title = sprintf('%1$s %2$s', ucwords(str_replace('-',' ',$this->slug)), $this->get_version());
-		$icon = empty($icon_class) ? '' : sprintf('<i class="%1$s"></i>', 
-			'dashicons-'==substr($icon_class,0,10) ?  ('dashicons '.$icon_class) : $icon_class) ;
+		$icon = empty($icon_class) ? '' : sprintf('<i class="%1$s"></i>',
+			'dashicons-'==substr($icon_class,0,10) ? ('dashicons '.$icon_class) : $icon_class) ;
     	return sprintf('<h2 class="title">%2$s%1$s</h2>', $title, $icon);				
 	}
 
@@ -171,12 +171,13 @@ SCRIPT;
 ADMIN_START;
 	}
 
-	function print_admin_form_with_sidebar_middle() {
+	function print_admin_form_with_sidebar_middle($enctype = false) {
 		$this_url = $_SERVER['REQUEST_URI'];
+	 	$enctype = $enctype ? 'enctype="multipart/form-data" ' : '';
 	    print <<< ADMIN_MIDDLE
 </div>
 <div id="post-body" class="has-sidebar"><div id="post-body-content" class="has-sidebar-content diy-wrap">
-<form id="diy_options" method="post" action="{$this_url}">
+<form id="diy_options" method="post" {$enctype}action="{$this_url}">
 ADMIN_MIDDLE;
 	}
 	
@@ -271,5 +272,5 @@ ADMIN_END;
 	abstract function page_content(); 
 
 	abstract function load_page();
-	
+
 }

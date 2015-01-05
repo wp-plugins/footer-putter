@@ -45,7 +45,7 @@ class Footer_Putter_Utils {
 		&& ($options = @unserialize($meta))
 		&& is_array($options))
 			return $options;
-		else 
+		else
 			return false;
 	}
 

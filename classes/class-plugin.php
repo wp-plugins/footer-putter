@@ -12,11 +12,12 @@ class Footer_Putter_Plugin {
 
  	public static function init() {
 		$dir = dirname(__FILE__) . '/';
-		require_once($dir . 'class-diy-options.php');
-		require_once($dir . 'class-options.php');
 		require_once($dir . 'class-utils.php');
-		require_once($dir . 'class-footer.php');
-		require_once($dir . 'class-footer-widgets.php');
+		require_once($dir . 'class-diy-options.php');
+		require_once($dir . 'class-credits-options.php');
+		require_once($dir . 'class-credits.php');
+		require_once($dir . 'class-credits-widgets.php');
+		require_once($dir . 'class-trademarks-widgets.php');
 		Footer_Credits_Options::init();
 		Footer_Credits::init();
 	}
@@ -25,7 +26,8 @@ class Footer_Putter_Plugin {
 		$dir = dirname(__FILE__) . '/';
 		require_once($dir . 'class-tooltip.php');
 		require_once($dir . 'class-admin.php');
-		require_once($dir . 'class-dashboard.php');
+		require_once($dir . 'class-feed-widget.php');
+      require_once($dir . 'class-dashboard.php');
 		require_once($dir . 'class-credits-admin.php');
 		require_once($dir . 'class-trademarks-admin.php');		
 		$intro = new Footer_Putter_Dashboard(FOOTER_PUTTER_VERSION, FOOTER_PUTTER_PATH, FOOTER_PUTTER_PLUGIN_NAME);
