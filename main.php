@@ -3,13 +3,13 @@
  * Plugin Name: Footer Putter
  * Plugin URI: http://www.diywebmastery.com/plugins/footer-putter/
  * Description: Put a footer on your site that boosts your credibility with both search engines and human visitors.
- * Version: 1.13
+ * Version: 1.14
  * Author: Russell Jamieson
  * Author URI: http://www.diywebmastery.com/about/
  * License: GPLv2+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
-define('FOOTER_PUTTER_VERSION','1.13');
+define('FOOTER_PUTTER_VERSION','1.14');
 define('FOOTER_PUTTER_FRIENDLY_NAME', 'Footer Putter') ;
 define('FOOTER_PUTTER_DOMAIN', 'FOOTER_PUTTER_DOMAIN') ;
 define('FOOTER_PUTTER_PATH', plugin_basename(__FILE__)) ;

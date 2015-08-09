@@ -87,7 +87,6 @@ class Footer_Credits  {
 		wp_enqueue_style('footer-credits-admin');
  	}
 
-	
 	public static function return_to_top( $text, $class) {
 		return sprintf( '<div id="footer-return" class="%1$s"><a rel="nofollow" href="#" onclick="window.scrollTo(0,0); return false;" >%2$s</a></div>', trim($class), $text);
 	}
@@ -113,7 +112,8 @@ class Footer_Credits  {
 
     private static function contact_email($show_email, $microdata, $prefix) {
       if  ($show_email && ($email = Footer_Credits_Options::get_term('email')))
-            return sprintf('%1$s<a href="mailto:%2$s" class="email"%3$s>%2$s</a>', $prefix, $email, $microdata ? ' itemprop="email"' : '') ;
+            return apply_filters ( 'footer_putter_contact_email', 
+               sprintf('%1$s<a href="mailto:%2$s" class="email"%3$s>%2$s</a>', $prefix, $email, $microdata ? ' itemprop="email"' : '') );
       else
             return '';
     }

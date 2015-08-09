@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.1
 Tested up to: 4.3
-Stable tag: 1.13
+Stable tag: 1.14
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,10 +48,13 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
-= 1.13 = 
+= 1.14 =  Added filter, footer_putter_contact_email, on email address to aid compatibility with Email Address Encoded plugin
+
+= 1.13 =
 
 * Checked for WordPress 4.3 compatibility
-* Updated to use Admin Notices
+* Updated to use dismissible Admin Notices for messages
+* Now uses tabbed metaboxes
 * Added option to hide Powered By WordPress on the TwentySomething themes
 * Re-enabled Admin Toolbar if all actions were removed on the wp_footer hook
 
@@ -63,8 +66,8 @@ For full version history please see http://www.diywebmastery.com/plugins/footer-
 
 == Upgrade Notice ==
 
-= 1.13 = 
-* Optional - Updated for WordPress 4.3
+= 1.14 = 
+* Optional -  Added filter on email address to aid compatibility with Email Address Encoded plugin
 
 == Links ==
 
