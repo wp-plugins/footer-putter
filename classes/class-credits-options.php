@@ -45,7 +45,8 @@ class Footer_Credits_Options  {
 		'footer_remove' => true,
  		'footer_filter_hook' => '',
  		'visibility' => '' ,
-      'use_microdata' => false
+      'use_microdata' => false,
+      'hide_wordpress' => false
 	);
 	
 	public static function init() {

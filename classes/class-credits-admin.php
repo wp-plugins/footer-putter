@@ -2,10 +2,10 @@
 class Footer_Credits_Admin extends Footer_Putter_Admin{
 
 	private $tips = array(
-			'owner' => array('heading' => 'Owner or Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'),
-            'microdata' => array('heading' => 'Use Microdata', 'tip' => 'Markup the organization details with HTML5 microdata.'),
+			'owner' => array('heading' => 'Owner/Business Name', 'tip' => 'Enter the name of the legal entity that owns and operates the site.'),
+			'microdata' => array('heading' => 'Use Microdata', 'tip' => 'Markup the organization details with HTML5 microdata.'),
 			'address' => array('heading' => 'Full Address', 'tip' => 'Enter the full address that you want to appear in the footer and the privacy and terms pages.'),
-	        'street_address' => array('heading' => 'Street Address', 'tip' => 'Enter the firat line of the address that you want to appear in the footer and the privacy and terms pages.'),
+			'street_address' => array('heading' => 'Street Address', 'tip' => 'Enter the firat line of the address that you want to appear in the footer and the privacy and terms pages.'),
 			'locality' => array('heading' => 'Locality (City)', 'tip' => 'Enter the town or city.'),
 			'region' => array('heading' => 'State (Region)', 'tip' => 'Enter the state, province, region or county.'),
 			'postal_code' => array('heading' => 'Postal Code', 'tip' => 'Enter the postal code.'),
@@ -23,10 +23,11 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 			'return_class' => array('heading' => 'Return To Top Class' , 'tip' => 'Add any custom class you want to apply to the Return To Top link.'),
 			'footer_class' => array('heading' => 'Footer Class' , 'tip' => 'Add any custom class you want to apply to the footer. The plugin comes with a class <i>white</i> that marks the text in the footer white. This is useful where the footer background is a dark color.'),
 			'footer_hook' => array('heading' => 'Footer Action Hook' , 'tip' => 'The hook where the footer widget area is added to the page. This field is only required if the theme does not already provide a suitable widget area where the footer widgets can be added.'),
-			'footer_remove' => array('heading' => 'Remove Existing Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
+			'footer_remove' => array('heading' => 'Remove All Actions?' , 'tip' => 'Click the checkbox to remove any other actions at the above footer hook. This may stop you getting two footers; one created by your theme and another created by this plugin. For some themes you will check this option as you will typically want to replace the theme footer by the plugin footer.'),
 			'footer_filter_hook' => array('heading' => 'Footer Filter Hook' , 'tip' => 'If you want to kill off the footer created by your theme, and your theme allows you to filter the content of the footer, then enter the hook where the theme filters the footer. This may stop you getting two footers; one created by your theme and another created by this plugin.'),
 			'privacy_contact' => array('heading' => 'Add Privacy Contact?', 'tip' => 'Add a section to the end of the Privacy page with contact information'),
 			'terms_contact' => array('heading' => 'Add Terms Contact?', 'tip' => 'Add a section to the end of the Terms page with contact and legal information'),
+			'hide_wordpress' => array('heading' => 'Hide WordPress link?', 'tip' => 'Hide link to WordPress.org'),
 	);
 		
 	function init() {
@@ -41,29 +42,19 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 
 	function page_content() {
 		$title = $this->admin_heading('Footer Credits',FOOTER_PUTTER_ICON);				
-		$this->print_admin_form_with_sidebar_start($title); 
-		do_meta_boxes($this->get_screen_id(), 'side', null); 
-		$this->print_admin_form_with_sidebar_middle();
-		do_meta_boxes($this->get_screen_id(), 'normal', null); 
-		$this->print_admin_form_end(__CLASS__, $this->get_keys());
+		$this->print_admin_form_with_sidebar($title, __CLASS__, $this->get_keys()); 
 	}   
 
 	function load_page() {
- 		$message = isset($_POST['options_update']) ? $this->save_credits() : '';	
-		$options = Footer_Credits_Options::get_options();
-		$callback_params = array ('options' => $options, 'message' => $message);
-		$this->add_meta_box('introduction',  'Introduction' , 'intro_panel', $callback_params);
-		$this->add_meta_box('owner',  'Site Owner Details' , 'owner_panel', $callback_params);
-		$this->add_meta_box('contact',  'Contact Details' , 'contact_panel', $callback_params);
-		$this->add_meta_box('legal',  'Legal Details' , 'legal_panel', $callback_params);
-		$this->add_meta_box('return',  'Return To Top' , 'return_panel', $callback_params);
-		$this->add_meta_box('example',  'Preview Footer Content' , 'preview_panel', $callback_params);
-		$this->add_meta_box('advanced',  'Advanced' , 'advanced_panel', $callback_params);
-		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel',$callback_params, 'side');
-
-	    $this->set_tooltips($this->tips);	
+ 		if (isset($_POST['options_update'])) $this->save_credits();	
+		$this->add_meta_box('introduction',  'Introduction' , 'intro_panel');
+		$this->add_meta_box('credits',  'Footer Settings' , 'credits_panel', array ('options' => Footer_Credits_Options::get_options()));
+		$this->add_meta_box('example',  'Footer Preview', 'preview_panel', null, 'advanced');
+		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel', null, 'side');
+	   $this->set_tooltips($this->tips);	
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_credits_styles'));
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
+ 		add_action('admin_enqueue_scripts',array($this, 'enqueue_metabox_scripts'));			
  		add_action('admin_enqueue_scripts',array($this, 'enqueue_postbox_scripts'));	
 	}
 
@@ -71,81 +62,87 @@ class Footer_Credits_Admin extends Footer_Putter_Admin{
 		wp_enqueue_style($this->get_code(), plugins_url('styles/footer-credits.css', dirname(__FILE__)), array(),$this->get_version());		
 }		
 
- 	function news_panel($post,$metabox){	
-		Footer_Putter_Feed_Widget::display_feeds();
+ 	function credits_panel($post,$metabox) {
+      $options = $metabox['args']['options'];
+      $this->display_metabox( array(
+         'Owner' => $this->owner_panel($options['terms']),
+         'Contact' => $this->contact_panel($options['terms']),
+         'Legal' => $this->legal_panel($options['terms']),
+         'Return To Top' => $this->return_panel($options),
+         'Advanced' => $this->advanced_panel($options)
+		));
+   }
+
+	function intro_panel() {	 	
+		printf('<p>%1$s</p>', __('The following information is used in the Footer Copyright Widget and optionally at the end of the Privacy Statement and Terms and Conditions pages.'));
 	}
 
-	function intro_panel($post,$metabox) {	
-		$message = $metabox['args']['message'];	 	
-		print <<< INTRO_PANEL
-<p>The following information is used in the Footer Copyright Widget and optionally at the end of the Privacy Statement and Terms and Conditions pages.</p>
-{$message}
-INTRO_PANEL;
-	}
+ 	function preview_panel() {			
+		printf('<p><i>%1$s</i></p><hr/>%2$s', __('Note: Preview is purely illustrative. Actual footer layout on the site will vary based on footer widget settings.'), Footer_Credits::footer(array('nav_menu' => 'Footer Menu')));
+	}	
 	
-	function owner_panel($post,$metabox) {	
-		$terms = $metabox['args']['options']['terms'];	 	
-		$this->print_text_field('owner', $terms['owner'], array('size' =>30));		
-		$this->print_text_field('country', $terms['country'], array('size' => 30));		
-		$this->print_text_field('address', $terms['address'], array('size' => 80));		
+	
+	function owner_panel($terms) {
+      $s = $this->fetch_text_field('owner', $terms['owner'], array('size' =>30)) . 		
+         $this->fetch_text_field('country', $terms['country'], array('size' => 30)) .		
+         $this->fetch_form_field('address', $terms['address'], 'textarea', array(), array('cols' => 30, 'rows' => 5));		
 		if (Footer_Credits::is_html5()) {
-			print('<p>Leave the above address field blank and fill in the various parts of the organization address below if you want to be able to use HTML5 microdata.</p>');
-			print('<h4>Organization Address</h4>');
-			$this->print_text_field('street_address', $terms['street_address'],  array('size' => 30));	
-			$this->print_text_field('locality', $terms['locality'],  array('size' => 30));	
-			$this->print_text_field('region', $terms['region'],  array('size' => 30));	
-			$this->print_text_field('postal_code', $terms['postal_code'],  array('size' => 12));	
-			print('<h4>Geographical Co-ordinates</h4>');
-			print('<p>The geographical co-ordinates are optional and are visible only to the search engines.</p>');
-			$this->print_text_field('latitude', $terms['latitude'], array('size' => 12));	
-			$this->print_text_field('longitude', $terms['longitude'], array('size' => 12));	
-			$this->print_text_field('map', $terms['map'],  array('size' =>30));	
+         return $s .
+			   '<p>Leave the above address field blank and fill in the various parts of the organization address below if you want to be able to use HTML5 microdata.</p>'.
+			   '<h4>Organization Address</h4>'.
+			   $this->fetch_text_field('street_address', $terms['street_address'],  array('size' => 30)) .
+			   $this->fetch_text_field('locality', $terms['locality'],  array('size' => 30)) .
+			   $this->fetch_text_field('region', $terms['region'],  array('size' => 30)) .
+			   $this->fetch_text_field('postal_code', $terms['postal_code'],  array('size' => 12)) .
+			   '<h4>Geographical Co-ordinates</h4>'. 
+			   '<p>The geographical co-ordinates are optional and are visible only to the search engines.</p>' .
+			   $this->fetch_text_field('latitude', $terms['latitude'], array('size' => 12)) .
+			   $this->fetch_text_field('longitude', $terms['longitude'], array('size' => 12)) .	
+			   $this->fetch_text_field('map', $terms['map'],  array('size' =>30));	
+		} else {
+         return $s;
 		}
 	}
 
-	function contact_panel($post,$metabox) {
-		$terms = $metabox['args']['options']['terms'];
-		$this->print_text_field('email', $terms['email'],  array('size' => 30));		
-		$this->print_text_field('telephone', $terms['telephone'],  array('size' => 30));		
-		$this->print_form_field('privacy_contact', $terms['privacy_contact'], 'checkbox');
-		$this->print_form_field('terms_contact', $terms['terms_contact'], 'checkbox');
+	function contact_panel($terms) {
+	  return
+		$this->fetch_text_field('email', $terms['email'],  array('size' => 30)) . 		
+		$this->fetch_text_field('telephone', $terms['telephone'],  array('size' => 30)) .	
+		$this->fetch_form_field('privacy_contact', $terms['privacy_contact'], 'checkbox') .
+		$this->fetch_form_field('terms_contact', $terms['terms_contact'], 'checkbox');
 	}
 
- 	function legal_panel($post,$metabox) {
-		$terms = $metabox['args']['options']['terms'];
-		$this->print_text_field('courts', $terms['courts'],  array('size' => 80));		
-		$this->print_text_field('updated', $terms['updated'],  array('size' => 30));		
-		$this->print_text_field('copyright_preamble', $terms['copyright_preamble'],  array('size' => 30));		
-		$this->print_text_field('copyright_start_year', $terms['copyright_start_year'],  array('size' => 5));		
+ 	function legal_panel($terms) {
+ 	 return
+		$this->fetch_text_field('courts', $terms['courts'],  array('size' => 80)) .	
+		$this->fetch_text_field('updated', $terms['updated'],  array('size' => 30)) .	
+		$this->fetch_text_field('copyright_preamble', $terms['copyright_preamble'],  array('size' => 30)) .	
+		$this->fetch_text_field('copyright_start_year', $terms['copyright_start_year'],  array('size' => 5));		
 	}
 
- 	function return_panel($post,$metabox) {		
-		$options = $metabox['args']['options'];	 	
-		$this->print_text_field('return_text', $options['return_text'], array('size' => 20));		
+ 	function return_panel($options) {		 	
+		return $this->fetch_text_field('return_text', $options['return_text'], array('size' => 20));		
 	}
 
- 	function preview_panel($post,$metabox) {		
-		$options = $metabox['args']['options'];	 	
-		echo Footer_Credits::footer(array('nav_menu' => 'Footer Menu'));
-	}
-
- 	function advanced_panel($post,$metabox) {		
-		$options = $metabox['args']['options'];	 	
+ 	function advanced_panel($options) {		 	
 		$url = 'http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks';
-		print <<< ADVANCED_PANEL
+		$before = <<< ADVANCED_PANEL
 <p>You can place the Copyright and Trademark widgets in any existing widget area. However, if your theme does not have a suitably located widget area in the footer then you can create one by specifying the hook
 where the Widget Area will be located.</p>
 <p>You may use a standard WordPress hook like <i>get_footer</i> or <i>wp_footer</i> or choose a hook that is theme-specific such as <i>twentyten_credits</i>, 
 <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>,<i>twentythirteen_credits</i> or <i>twentyfourteen_credits</i>. If you using a Genesis child theme and the theme does not have a suitable widget area then use 
 the hook <i>genesis_footer</i> or maybe <i>genesis_after</i>. See what looks best. Click for <a href="{$url}">suggestions of which hook to use for common WordPress themes</a>.</p> 
 ADVANCED_PANEL;
-		$this->print_text_field('footer_hook', $options['footer_hook'],  array('size' => 30));		
-		$this->print_form_field('footer_remove', $options['footer_remove'], 'checkbox');
-		print <<< REMOVE_PANEL
+		$f = $this->fetch_text_field('footer_hook', $options['footer_hook'],  array('size' => 30)) .		
+		 $this->fetch_form_field('footer_remove', $options['footer_remove'], 'checkbox');
+		$after = <<< REMOVE_PANEL
 <p>If your WordPress theme supplies a filter hook rather than an action hook where it generates the footer, and you want to suppress the theme footer,
 then specify the hook below. For example, entering <i>genesis_footer_output</i> will suppress the standard Genesis child theme footer.</p>
 REMOVE_PANEL;
-		$this->print_text_field('footer_filter_hook', $options['footer_filter_hook'],  array('size' => 30));		
+		$hook = $this->fetch_text_field('footer_filter_hook', $options['footer_filter_hook'],  array('size' => 30));		
+      if (($theme = wp_get_theme()) && (strpos(strtolower($theme->get('Name')), 'twenty') !== FALSE))		
+         $hook .= $this->fetch_form_field('hide_wordpress', $options['hide_wordpress'],  'checkbox');		
+      return $before . $f . $after . $hook;
 	} 
 
 	function save_credits() {
@@ -163,18 +160,17 @@ REMOVE_PANEL;
  					case 'footer_filter_hook': $options[$option] = preg_replace('/\W/','',$val); break;
 					default: $options[$option] = trim($val); 				
 					}
-    		} //end for	
-    		$class='updated fade';
-   			$saved =  Footer_Credits_Options::save_options($options) ;
-   			if ($saved)  {
-       			$message = 'Footer Settings saved.';
-   			} else
-       			$message = 'Footer Settings have not been changed.';
+    		} //end for	;
+   		$saved =  Footer_Credits_Options::save_options($options) ;
+   	   $message = $saved ? 'updated successfully' : 'have not been updated';
+         $is_error = false;
   		} else {
-  		    $class='error';
-       		$message= 'Footer Settings not found!';
+       	$message= 'not found!';
+         $is_error = true;
   		}
-  		return sprintf('<div id="message" class="%1$s "><p>%2$s</p></div>',$class, __($message));
+
+  		$this->add_admin_notice('Footer Settings ', $message, $is_error);  		
+  		return $saved;
 	}
 
 }

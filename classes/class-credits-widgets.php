@@ -20,7 +20,7 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		'show_return' => array('heading' => 'Show Return To Top Links', 'tip' => 'Show link to return to the top of the page'),
 		'return_class' => array('heading' => 'Return To Top', 'tip' => 'Add custom classes to apply to the return to top links'),
 		'footer_class' => array('heading' => 'Footer Credits', 'tip' => 'Add custom classes to apply to the footer menu, copyright and contact information'),
-		'visibility' => array('heading' => 'Widget Visibility', 'tip' => 'Determine on which pages the footer widget is displayed'),
+		'visibility' => array('heading' => 'Show or Hide', 'tip' => 'Determine on which pages the footer widget is displayed'),
 	);
 
 	function get_tips() {
@@ -74,8 +74,10 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		
 		$this->instance = wp_parse_args( (array) $instance, $this->get_defaults() );
 		$this->tooltips = new Footer_Putter_Tooltip($this->get_tips());
-
+      print '<div class="diy-wrap">';
 		$this->print_form_field('nav_menu',  'select', $menus);
+      print ('<hr/><h4>Options</h4>');
+
 		$this->print_form_field('center',  'checkbox');
 		$this->print_form_field('two_lines', 'checkbox');
 		$this->print_form_field('show_copyright', 'checkbox');
@@ -86,7 +88,7 @@ class Footer_Putter_Copyright_Widget extends WP_Widget {
 		if (Footer_Putter_Utils::is_html5()) $this->print_form_field('use_microdata', 'checkbox');
 
 		print <<< CUSTOM_CLASSES
-<h4>Custom Classes (Optional)</h4>
+<hr/><h4>Custom Classes</h4>
 <p>Add any custom CSS classes you want apply to the footer section content to change the font color and size.</p>
 <p>For your convenience we have defined 3 color classes <i>dark</i>, <i>light</i> and <i>white</i>, and 2 size classes, 
 <i>small</i> and <i>tiny</i>. Feel free to use these alongside your own custom CSS classes.</p>
@@ -94,7 +96,9 @@ CUSTOM_CLASSES;
 
 		$this->print_form_field('return_class', 'text', array(), array('size' => 10));
 		$this->print_form_field('footer_class', 'text', array(), array('size' => 10));
+      print ('<hr/><h4>Widget Presence</h4>');
 		$this->print_form_field('visibility',  'radio', Footer_Putter_Utils::get_visibility_options(), array('separator' => '<br />'));
+      print '</div>';
 	}
 
 	function print_form_field($fld, $type, $options = array(), $args = array()) {
