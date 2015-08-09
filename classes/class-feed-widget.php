@@ -5,7 +5,7 @@ if (!class_exists('Footer_Putter_Feed_Widget')) {
 	function __construct() {
 		$widget_ops = array( 'description' => __('Displays Featured image in place of title in any RSS or Atom feed.') );
 		$control_ops = array( 'width' => 400, 'height' => 200 );
-		parent::__construct( 'genesis-club-feed', __('Genesis Club Feed'), $widget_ops, $control_ops );
+		parent::__construct( 'footer-putter-feed', __('Footer Putter Feed'), $widget_ops, $control_ops );
 	}
 
 	function widget($args, $instance) {

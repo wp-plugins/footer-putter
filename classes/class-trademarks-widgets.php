@@ -8,10 +8,10 @@ class Footer_Putter_Trademark_Widget extends WP_Widget {
 	private $tips = array(
 			'title' => array('heading' => 'Title', 'tip' => 'Widget Title'),
 			'category' => array('heading' => 'Category', 'tip' => 'Select Link Category for Your Trademarks'),
-			'limit' => array('heading' => 'Number of links', 'tip' => 'Number of trademarks to show'),
+			'limit' => array('heading' => '# of links', 'tip' => 'Number of trademarks to show'),
 			'orderby' => array('heading' => 'Order By', 'tip' => 'Sort by name, rating, ID or random'),
 			'nofollow' => array('heading' => 'Make Links Nofollow', 'tip' => 'Mark the links with rel=nofollow'),
-			'visibility' => array('heading' => 'Widget Visibility', 'tip' => 'Determine on which pages the footer widget is displayed'),
+			'visibility' => array('heading' => 'Show or Hide', 'tip' => 'Determine on which pages the footer widget is displayed'),
 			);
 
     private	$defaults = array( 'title' => '',
@@ -101,7 +101,7 @@ class Footer_Putter_Trademark_Widget extends WP_Widget {
 	function form( $instance ) {
 		$this->instance = wp_parse_args( (array) $instance, $this->get_defaults() );
 		$this->tooltips = new Footer_Putter_Tooltip($this->get_tips());
-
+      print '<div class="diy-wrap">';
 		$links = array();
 		$link_cats = get_terms( 'link_category' );
 		foreach ( $link_cats as $link_cat ) {
@@ -118,8 +118,10 @@ class Footer_Putter_Trademark_Widget extends WP_Widget {
 		));
 		$this->print_form_field('limit',  'text', array(),  array('size' => 3 ,'maxlength' => 3));
 		$this->print_form_field('nofollow',  'checkbox');
-	    $this->print_form_field('visibility', 'radio',
+      print ('<hr/><h4>Widget Presence</h4>');
+      $this->print_form_field('visibility', 'radio',
 			Footer_Putter_Utils::get_visibility_options(), array('separator' => '<br />'));
+      print '</div>';
 	}
 
 	function print_form_field ($fld, $type, $options = array(), $args = array()) {

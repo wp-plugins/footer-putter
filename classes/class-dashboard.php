@@ -18,26 +18,30 @@ class Footer_Putter_Dashboard extends Footer_Putter_Admin {
 	}
 
 	function page_content() {
- 		$title = $this->admin_heading('Footer Putter', FOOTER_PUTTER_ICON);				
-		$this->print_admin_form_with_sidebar_start($title); 
-		do_meta_boxes($this->get_screen_id(), 'side', null); 
-		$this->print_admin_form_with_sidebar_middle();
-		do_meta_boxes($this->get_screen_id(), 'normal', null); 
-		$this->print_admin_form_end(__CLASS__);
+ 		$title = $this->admin_heading('Footer Putter v'. $this->get_version(), FOOTER_PUTTER_ICON);				
+		$this->print_admin_form_with_sidebar($title, __CLASS__); 
 	} 
 
 	function load_page() {
 		$this->add_tooltip_support();
       add_action('admin_enqueue_scripts', array($this, 'register_admin_styles'));
       add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
+      add_action('admin_enqueue_scripts', array($this, 'enqueue_metabox_scripts'));
       add_action('admin_enqueue_scripts', array($this, 'enqueue_postbox_scripts'));
 		$this->add_meta_box('intro', 'Introduction',  'intro_panel');
-		$this->add_meta_box('widgets','Widgets', 'widgets_panel');
-		$this->add_meta_box('instructions', 'Instructions',  'instructions_panel');
-		$this->add_meta_box('hooks', 'Footer Hook',  'hooks_panel');
-		$this->add_meta_box('links', 'Useful Links', 'links_panel', null, 'side');
+		$this->add_meta_box('details','Details', 'footer_panel');
 		$this->add_meta_box('news', 'DIY Webmastery News', 'news_panel', null, 'side');
 	}
+
+ 	function footer_panel() {
+      $this->display_metabox( array(
+         'Widgets' => $this->widgets_panel(),
+         'Instructions' => $this->instructions_panel(),
+         'Footer Hook' =>  $this->hooks_panel(),
+         'Useful Links' =>  $this->links_panel()
+		));
+   }
+
 		
 	function intro_panel() {
      	$plugin = FOOTER_PUTTER_FRIENDLY_NAME;
@@ -57,13 +61,14 @@ INTRO_PANEL;
 	}
 
 	function widgets_panel() {
-    	print <<< WIDGETS_PANEL
+    	return <<< WIDGETS_PANEL
 <p>The plugins define two widgets: 
 <ol>
 <li>a <b>Footer Copyright Widget</b> that places a line at the foot of your site containing as many of the items listed above that you want to disclose.</li>
 <li>a <b>Trademarks Widget</b> that displays a line of trademarks that you have previously set up as "Links".
 </ol></p>
 <p>Typically you will drag both widgets into the Custom Footer Widget Area.</p>
+<p>The widgets have settings that allow you to control both the footer content and the layout, and also whether or not the widgets appear at all on landing pages.</p>
 WIDGETS_PANEL;
 	}
 
@@ -72,7 +77,7 @@ WIDGETS_PANEL;
      	$widgets_url = admin_url('widgets.php');
     	$credits_url = Footer_Putter_Plugin::get_link_url('credits');
     	$trademarks_url = Footer_Putter_Plugin::get_link_url('trademarks'); 
-    	print <<< INSTRUCTIONS_PANEL
+    	return <<< INSTRUCTIONS_PANEL
 <h4>Create Standard Pages And Footer Menu</h4>
 <ol>
 <li>Create a <i>Privacy Policy</i> page with the slug/permalink <em>privacy</em>, choose a page template with no sidebar.</li>
@@ -80,7 +85,7 @@ WIDGETS_PANEL;
 <li>Create a <i>Contact</i> page with a contact form.</li>
 <li>Create an <i>About</i> page, with information either about the site or about its owner.</li>
 <li>If the site is selling an information product you may want to create a <i>Disclaimer</i> page, regarding any claims about the product performance.</li>
-<li>Create a WordPress menu called <i>Footer Menu</i> with the above pages.</li>
+<li>Create a WordPress menu called <i>Footer Menu</i> and add the above pages to the footer menu.</li>
 </ol>
 <h4>Update Business Information</h4>
 <ol>
@@ -110,19 +115,17 @@ INSTRUCTIONS_PANEL;
 	function hooks_panel() {
     	$home_url = FOOTER_PUTTER_HOME_URL;
      	$plugin = FOOTER_PUTTER_FRIENDLY_NAME;
-    	print <<< HOOKS_PANEL
-	
+    	return <<< HOOKS_PANEL
 <p>The footer hook is only required if your theme does not already have a footer widget area into which you can drag the two widgets.</p>
 <p>For some themes, the footer hook is left blank, for others use a WordPress hook such as <i>get_footer</i> or <i>wp_footer</i>, 
-or use a theme-specific hook such as <i>twentyten_credits</i>, <i>twentyeleven_credits</i>, <i>twentytwelve_credits</i>, 
-<i>twentythirteen_credits</i>, <i>twentyfourteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc.</p>
+or use a theme-specific hook such as <i>twentytfourteen_credits</i>, <i>twentyfifteen_credits</i>, <i>genesis_footer</i>, <i>pagelines_leaf</i>, etc.</p>
 <p>Check out the <a href="{$home_url}">{$plugin} page</a> for more information about the plugin.</p> 
 HOOKS_PANEL;
 	}
 	
 	function links_panel() {
 		$home = FOOTER_PUTTER_HOME_URL;	
- 		print <<< LINKS_PANEL
+ 		return <<< LINKS_PANEL
 <ul>
 <li><a rel="external" href="{$home}">Footer Putter Plugin Home</a></li>
 <li><a rel="external" href="http://www.diywebmastery.com/footer-credits-compatible-themes-and-hooks/">Themes and Recommended Footer Hooks</a></li>
@@ -130,10 +133,6 @@ HOOKS_PANEL;
 <li><a rel="external" href="http://www.diywebmastery.com/4109/using-html5-microdata-footer/">Using HTML5 Microdata for better SEO and Local Search</a></li>
 </ul>
 LINKS_PANEL;
-	}
-	
- 	function news_panel($post,$metabox){	
-		Footer_Putter_Feed_Widget::display_feeds();
 	}
 	
 }

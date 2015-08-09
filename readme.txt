@@ -2,9 +2,9 @@
 Contributors: powerblogservice, diywebmastery
 Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
-Requires at least: 3.0
-Tested up to: 4.1
-Stable tag: 1.12
+Requires at least: 3.1
+Tested up to: 4.3
+Stable tag: 1.13
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,7 @@ Put a footer on your site that boosts your credibility with both search engines 
 * Automatic HTML5 support
 * Option to use HTML5 microdata for Organization in accordance with Google recommendations
 * Option to apply rel=nofollow automatically to footer trademark links
+* Option to hide Powered By WordPress on TwentySomething themes
 
 == Installation ==
 
@@ -35,7 +36,6 @@ Put a footer on your site that boosts your credibility with both search engines 
 == Frequently Asked Questions ==
 
 * Why is a footer important?  By creating an appropriate footer you can enhance the credibility of your site by informing visitors on how to contact you, asserting copyright over the site content, setting out the legal terms and conditions for using the site, and establishing the trade associations or other bodies that recognize the legitimacy of your business.
-
 
 == Screenshots ==
 1. Example of a footer with both a copyright widget and a trademark widget 
@@ -48,20 +48,23 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
+= 1.13 = 
+
+* Checked for WordPress 4.3 compatibility
+* Updated to use Admin Notices
+* Added option to hide Powered By WordPress on the TwentySomething themes
+* Re-enabled Admin Toolbar if all actions were removed on the wp_footer hook
+
 = 1.12 = Updated for WordPress 4.1, bug fix to privacy page terms, and  added useful links and DIYWebmastery news feed sections in the sidebar
 
 = 1.11 = Add option to set Copyright Text
-
-= 1.10 = Updated tooltips to use dash-icons font
-
-= 1.9 = Added title to Footer Trademarks Widget, improved control over widgets on landing pages with a filter hook, improved online documentation, refactored code in accordance with current WordPress coding standards.
 
 For full version history please see http://www.diywebmastery.com/plugins/footer-putter/footer-putter-version-history/
 
 == Upgrade Notice ==
 
-= 1.12 = 
-* Optional - Update for WordPress 4.1 , admin improvements
+= 1.13 = 
+* Optional - Updated for WordPress 4.3
 
 == Links ==
 

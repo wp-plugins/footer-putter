@@ -9,10 +9,6 @@ class Footer_Putter_Utils {
 		return self::$is_html5;
 	}
 
-	static function is_genesis2() {
-		return function_exists('genesis_html5') ; 
-	}
-
 	static function get_post_id() {
 		global $post;
 
@@ -42,8 +38,8 @@ class Footer_Putter_Utils {
 	static function get_meta ($post_id, $key) {
 		if ($post_id && $key
 		&& ($meta = get_post_meta($post_id, $key, true))
-		&& ($options = @unserialize($meta))
-		&& is_array($options))
+		&& ($options = (is_serialized($meta) ? @unserialize($meta) : $meta))
+		&& (is_array($options) || is_string($options)))
 			return $options;
 		else
 			return false;
@@ -90,7 +86,7 @@ class Footer_Putter_Utils {
 			'show_landing' => 'Show only on landing pages');
 	}
 
-	static function selector($fld_id, $fld_name, $value, $options) {
+	static function selector($fld_id, $fld_name, $value, $options, $multiple = false) {
 		$input = '';
 		if (is_array($options)) {
 			foreach ($options as $optkey => $optlabel)
@@ -99,7 +95,7 @@ class Footer_Putter_Utils {
 		} else {
 			$input = $options;
 		}
-		return sprintf('<select id="%1$s" name="%2$s">%3$s</select>', $fld_id, $fld_name, $input);							
+		return sprintf('<select id="%1$s" name="%2$s"%4$s>%3$s</select>', $fld_id, $fld_name, $input, $multiple ? ' multiple':'');							
 	}
 
 	static function form_field($fld_id, $fld_name, $label, $value, $type, $options = array(), $args = array(), $wrap = false) {
@@ -143,9 +139,21 @@ class Footer_Putter_Utils {
 							$fld_id, $fld_name, str_replace('\'','"',checked($optkey, $value, false)), $optkey, $optlabel, $separator); 
 					$input = sprintf('<fieldset class="diy-fieldset">%1$s</fieldset>',$input); 						
 				} else {		
-					$input .= sprintf('<input type="checkbox" class="checkbox" id="%1$s" name="%2$s" %3$svalue="1"/>',
+					$input .= sprintf('<input type="checkbox" class="checkbox" id="%1$s" name="%2$s" %3$svalue="1" class="diy-checkbox" />',
 						$fld_id, $fld_name, checked($value, '1', false));
 				}
+				break;
+				
+			case 'checkboxes': 
+			   $values = (array) $value;
+			   $options = (array) $options;
+			   if (isset($legend))
+				  $input .= sprintf('<legend class="screen-reader-text"><span>%1$s</span></legend>', $legend);
+				foreach ($options as $optkey => $optlabel)
+				  $input .= sprintf('<li><input type="checkbox" id="%1$s" name="%2$s[]" %3$s value="%4$s" /><label for="%1$s">%5$s</label></li>',
+					$fld_id, $fld_name, in_array($optkey, $values) ? 'checked="checked"' : '', $optkey, $optlabel); 
+				$input = sprintf('<fieldset class="diy-fieldset%2$s"><ul>%1$s</ul></fieldset>',$input, isset($class) ? (' '.$class) : ''); 						
+		
 				break;
 			case 'radio': 
 				if (is_array($options) && (count($options) > 0)) {
@@ -159,7 +167,7 @@ class Footer_Putter_Utils {
 				}
 				break;		
 			case 'select': 
-				$input =  self::selector($fld_id, $fld_name, $value, $options);							
+				$input =  self::selector($fld_id, $fld_name, $value, $options, isset($multiple));							
 				break;	
 			case 'hidden': return sprintf('<input type="hidden" name="%1$s" value="%2$s" />', $fld_name, $value);	
 			default: $input = $value;	
@@ -173,5 +181,14 @@ class Footer_Putter_Utils {
 		}
 		return sprintf($format, $label, $input);
 	}
+	
+	static function register_tooltip_styles() {
+		wp_register_style('diy-tooltip', plugins_url('styles/tooltip.css',dirname(__FILE__)), array(), null); 
+	}
+
+	static function enqueue_tooltip_styles() {
+         wp_enqueue_style('diy-tooltip');
+         wp_enqueue_style('dashicons');
+    }
 
 }

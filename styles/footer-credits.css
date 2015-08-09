@@ -29,3 +29,7 @@
 .widget_footer_copyright,  .widget_footer_trademarks 
 	{ margin: 0 !important; padding: 0 !important; width: 100% !important; float:none !important; }
 .site-info .custom-footer { margin: 0 !important; border: 0 !important; padding : 0!important; width: 100% !important;}
+
+.custom-footer.hide-wordpress + a[href='https://wordpress.org/'], .custom-footer.hide-wordpress + a[href='http://wordpress.org/'] {
+	display: none;
+}

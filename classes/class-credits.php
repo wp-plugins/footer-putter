@@ -2,7 +2,7 @@
 
 class Footer_Credits  {
 
-    const CODE = 'footer-credits'; //element prefix
+   const CODE = 'footer-credits'; //shortcode prefix
 	const SIDEBAR_ID = 'last-footer';
 
 	public static function init() {
@@ -50,7 +50,13 @@ class Footer_Credits  {
 			
 		//insert custom footer at specified hook
 		if ($footer_hook = $options['footer_hook'])  {
-			if ($options['footer_remove']) remove_all_actions( $footer_hook); 
+			if ($options['footer_remove']) {
+			   remove_all_actions( $footer_hook); 
+			   if ($footer_hook =='wp_footer') {
+               add_action( 'wp_footer', 'wp_print_footer_scripts', 20);  //put back the footer scripts             
+               add_action( 'wp_footer', 'wp_admin_bar_render', 1000 ); //put back the admin bar
+			   }
+         }
 			add_action( $footer_hook, array(__CLASS__, 'custom_footer')); 
 		}
 	
@@ -252,12 +258,13 @@ class Footer_Credits  {
 
 	public static function custom_footer() {
 		if ( is_active_sidebar( self::SIDEBAR_ID) ) {
+         $class = 'custom-footer'. (Footer_Credits_Options::get_option('hide_wordpress') ? ' hide-wordpress' :'');
 			if (self::is_html5()) {
-				echo '<footer class="custom-footer" role="contentinfo" itemscope="itemscope" itemtype="http://schema.org/WPFooter">';
+				printf('<footer class="%1$s" role="contentinfo" itemscope="itemscope" itemtype="http://schema.org/WPFooter">', $class);
 				dynamic_sidebar( self::SIDEBAR_ID );
 				echo '</footer><!-- end .custom-footer -->';
 			} else {
-				echo '<div class="custom-footer">';
+				printf('<div class="%1$s">', $class);
 				dynamic_sidebar( self::SIDEBAR_ID );
 				echo '</div><!-- end .custom-footer -->';
 			}
