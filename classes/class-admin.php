@@ -138,7 +138,7 @@ abstract class Footer_Putter_Admin {
 	function form_field($id, $name, $label, $value, $type, $options = array(), $args = array(), $wrap = false) {
 		if (!$label) $label = $id;
 		$label_args = (is_array($args) && array_key_exists('label_args', $args)) ? $args['label_args'] : false;
- 		return Genesis_Club_Utils::form_field($id, $name, $this->tooltips->tip($label, $label_args), $value, $type, $options, $args, $wrap);
+ 		return Footer_Putter_Utils::form_field($id, $name, $this->tooltips->tip($label, $label_args), $value, $type, $options, $args, $wrap);
  	}	
 
 	function meta_form_field($meta, $key, $type, $options=array(), $args=array()) {
@@ -239,7 +239,7 @@ abstract class Footer_Putter_Admin {
 
 	function admin_heading($title = '', $icon_class = '') {
 		if (empty($title)) $title = sprintf('%1$s %2$s', ucwords(str_replace('-',' ',$this->slug)), $this->get_version());
-		if (empty($icon_class)) $icon_class = GENESIS_CLUB_ICON;
+		if (empty($icon_class)) $icon_class = FOOTER_PUTTER_ICON;
 		$icon = sprintf('<i class="%1$s"></i>', 'dashicons-'==substr($icon_class,0,10) ? ('dashicons '.$icon_class) : $icon_class) ;
     	return sprintf('<h2 class="title">%2$s%1$s</h2>', $title, $icon);				
 	}

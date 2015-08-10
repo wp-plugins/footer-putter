@@ -4,7 +4,7 @@ Donate link: http://www.diywebmastery.com/donate/
 Tags: footer, copyright, trademark
 Requires at least: 3.1
 Tested up to: 4.3
-Stable tag: 1.14
+Stable tag: 1.14.1
 License: GPLv2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,7 +48,9 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 == Changelog ==
 
-= 1.14 =  Added filter, footer_putter_contact_email, on email address to aid compatibility with Email Address Encoded plugin
+= 1.14.1 =  Fix module name error
+
+= 1.14 =  Support for email address encoding
 
 = 1.13 =
 
@@ -60,14 +62,13 @@ Put a footer on your site that boosts your credibility with both search engines 
 
 = 1.12 = Updated for WordPress 4.1, bug fix to privacy page terms, and  added useful links and DIYWebmastery news feed sections in the sidebar
 
-= 1.11 = Add option to set Copyright Text
 
 For full version history please see http://www.diywebmastery.com/plugins/footer-putter/footer-putter-version-history/
 
 == Upgrade Notice ==
 
-= 1.14 = 
-* Optional -  Added filter on email address to aid compatibility with Email Address Encoded plugin
+= 1.14.1 = 
+* Mandatory -  Fix module name error
 
 == Links ==
 
